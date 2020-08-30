@@ -6,7 +6,7 @@
 //  Copyright © 2020 Pawel Klapuch. All rights reserved.
 //
 
-import UIKit
+import Foundation
 import PromiseKit
 
 class APIQueuedSession: NSObject {
