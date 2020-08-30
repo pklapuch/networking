@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum APIPayload {
+public enum APIPayload {
     
     case plainJSON([String : Any])
     case httpQuery([String : Any])

@@ -9,7 +9,7 @@
 import Foundation
 import PromiseKit
 
-protocol APICredentialStoreProtocol {
+public protocol APICredentialStoreProtocol {
 
     func store(token: APISessionTokenProtocol) -> Promise<Void>
     func token() -> Promise<APISessionTokenProtocol?>

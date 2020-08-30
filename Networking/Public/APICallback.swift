@@ -10,7 +10,7 @@ import Foundation
 
 extension APIRequest {
     
-    class APICallback {
+    public class APICallback {
         
         typealias SuccessBlock = (APIResponse) -> Void
         typealias ErrorBlock = (Swift.Error) -> Void

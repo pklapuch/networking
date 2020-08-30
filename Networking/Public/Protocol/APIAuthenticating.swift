@@ -9,7 +9,7 @@
 import Foundation
 import PromiseKit
 
-protocol APIAuthenticating {
+public protocol APIAuthenticating {
 
     func refresh() -> Promise<APISessionTokenProtocol>
     

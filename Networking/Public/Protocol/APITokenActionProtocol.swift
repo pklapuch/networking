@@ -9,7 +9,7 @@
 import Foundation
 import PromiseKit
 
-protocol APITokenActionProtocol {
+public protocol APITokenActionProtocol {
     
     func authenticate(credential: APIAuthCredential) -> Promise<APISessionTokenProtocol>
     

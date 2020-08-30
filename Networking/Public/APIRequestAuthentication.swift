@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum APIRequestAuthentication {
+public enum APIRequestAuthentication {
 
     case none
     

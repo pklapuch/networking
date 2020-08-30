@@ -8,15 +8,13 @@
 
 import Foundation
 
-class APIRequest: NSObject {
+open class APIRequest: NSObject {
     
-    typealias HTTPHeaders = [String: String]
-    
-    enum Error: CustomNSError, LocalizedError {
+    public enum Error: CustomNSError, LocalizedError {
         
         case invalidPath
         
-        var errorDescription: String? {
+        public var errorDescription: String? {
             switch self {
             case .invalidPath: return "invalid path"
             }
@@ -33,19 +31,19 @@ class APIRequest: NSObject {
     let url: URL
     let method: HTTPMethod
     let payload: APIPayload?
-    let headers: HTTPHeaders
+    let headers: APIHTTPHeaders
     let policy: URLRequest.CachePolicy
     let timeout: Int
     let authentication: APIRequestAuthentication
-    var modelParser: ModelParsing?
-    var errorParser: ErrorParsing?
+    var modelParser: APIModelParsing?
+    var errorParser: APIErrorParsing?
     
-    convenience init(path: String,
+    public convenience init(path: String,
                      method: HTTPMethod,
                      payload: APIPayload?,
-                     headers: HTTPHeaders,
-                     modelParser: ModelParsing? = nil,
-                     errorParser: ErrorParsing? = nil,
+                     headers: APIHTTPHeaders,
+                     modelParser: APIModelParsing? = nil,
+                     errorParser: APIErrorParsing? = nil,
                      authentication: APIRequestAuthentication? = nil,
                      policy: URLRequest.CachePolicy? = nil,
                      timeout: Int? = nil) throws {
@@ -62,12 +60,12 @@ class APIRequest: NSObject {
                   timeout: timeout)
     }
     
-    init(url: URL,
+    public init(url: URL,
          method: HTTPMethod,
          payload: APIPayload?,
-         headers: HTTPHeaders,
-         modelParser: ModelParsing? = nil,
-         errorParser: ErrorParsing? = nil,
+         headers: APIHTTPHeaders,
+         modelParser: APIModelParsing? = nil,
+         errorParser: APIErrorParsing? = nil,
          authentication: APIRequestAuthentication? = nil,
          policy: URLRequest.CachePolicy? = nil,
          timeout: Int? = nil) {
@@ -79,7 +77,7 @@ class APIRequest: NSObject {
         self.headers = headers
         self.modelParser = modelParser
         self.errorParser = errorParser
-        self.authentication = authentication ?? APIRequestAuthentication.none
+        self.authentication = authentication ?? APIRequestAuthentication.oauth
         self.policy = policy ?? Configuration.defaultCachePolicy
         self.timeout = timeout ?? Configuration.defaultTimeoutSeconds
     }

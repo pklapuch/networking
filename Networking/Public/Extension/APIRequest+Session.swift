@@ -22,7 +22,7 @@ extension APIRequest.APICallback {
 
 extension APIRequest {
         
-    func createURLRequest(sessionHeaders: APIRequest.HTTPHeaders? = nil) -> Promise<URLRequest> {
+    func createURLRequest(sessionHeaders: APIHTTPHeaders? = nil) -> Promise<URLRequest> {
      
         return Promise<URLRequest> { r in
             
@@ -33,8 +33,8 @@ extension APIRequest {
                                             timeoutInterval: TimeInterval(timeout))
                 
                 urlRequset.httpMethod = method.rawValue
-                sessionHeaders?.forEach { urlRequset.setValue($0.value, forHTTPHeaderField: $0.key) }
-                headers.forEach { urlRequset.setValue($0.value, forHTTPHeaderField: $0.key) }
+                sessionHeaders?.forEach { urlRequset.setValue($0.value, forHTTPHeaderField: $0.name) }
+                headers.forEach { urlRequset.setValue($0.value, forHTTPHeaderField: $0.name) }
                 urlRequset.httpBody = try payload?.encode()
                 
                 r.fulfill(urlRequset)
@@ -65,7 +65,7 @@ extension APIRequest {
     }
     
     func getHeadersDescription() -> String {
-        let params = headers.map { header -> String in return "\(header.key): \(header.value)" }
+        let params = headers.map { header -> String in return "\(header.name): \(header.value)" }
         return params.joined(separator: "; ")
     }
 }

@@ -1,5 +1,5 @@
 //
-//  ModelParsing.swift
+//  APIModelParsing.swift
 //  Networking
 //
 //  Created by Pawel Klapuch on 27/08/2020.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol ModelParsing {
+public protocol APIModelParsing {
 
     func decode(data: Data) throws -> Codable?
 }

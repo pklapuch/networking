@@ -6,7 +6,8 @@
 //  Copyright © 2020 Pawel Klapuch. All rights reserved.
 //
 
-class APINetworking {
 
-    static var log: APILogging?
+public class APINetworking {
+
+    static public var log: APILogging?
 }

@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol APISessionTokenProtocol {
+public protocol APISessionTokenProtocol {
     
     func getAccessToken() -> String
     

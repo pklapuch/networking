@@ -10,7 +10,7 @@ import Foundation
 
 extension APISession {
     
-    private enum InternalError: CustomNSError {
+    enum InternalError: CustomNSError {
         
         static var errorDomain: String { "APISession.InternalError" }
         var errorCode: Int {

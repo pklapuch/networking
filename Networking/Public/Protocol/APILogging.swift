@@ -8,14 +8,14 @@
 
 import Foundation
 
-enum APILoggingType {
+public enum APILoggingType {
     
     case info
     
     case error
 }
 
-protocol APILogging {
+public protocol APILogging {
     
-    func log(message: String, type: APILoggingType)
+    func apiLog(message: String, type: APILoggingType)
 }

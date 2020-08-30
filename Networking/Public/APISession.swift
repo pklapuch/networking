@@ -9,32 +9,37 @@
 import Foundation
 import PromiseKit
 
-class APISession: NSObject, URLSessionDelegate {
+public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
     
-    var onAuthenitcationRequired: ((Swift.Error?) -> Void)?
+    public var onAuthenitcationRequired: ((Swift.Error?) -> Void)?
     
-    enum Error: CustomNSError {
-        
-        static var errorDomain: String { "APISession.Error" }
-        var errorCode: Int {
-            switch self {
-            case .fatal: return 0
-            case .cancelled: return 1
-            case .duplicatedRequest: return 2
-            case .undefinedStatusCode(_): return 3
-            case .unauthorized: return 4
-            case .tokenExpired: return 5
-            }
-        }
+    public enum Error: CustomNSError, LocalizedError {
         
         case fatal
         case cancelled
         case duplicatedRequest
-        case undefinedStatusCode(String)
         case unauthorized
-        case tokenExpired // TMP
-    }
     
+        public static var errorDomain: String { "APISession.Error" }
+        public var errorCode: Int {
+            switch self {
+            case .fatal: return 0
+            case .cancelled: return 1
+            case .duplicatedRequest: return 2
+            case .unauthorized: return 3
+            }
+        }
+        
+        public var errorDescription: String? {
+            switch self {
+            case .fatal: return "fatal"
+            case .cancelled: return "cancelled"
+            case .duplicatedRequest: return "duplicated request"
+            case .unauthorized: return "unauthorized"
+            }
+        }
+    }
+        
     private let queue = DispatchQueue(label: "com.pk.networking.session")
     private var urlSession: URLSession!
     
@@ -54,7 +59,7 @@ class APISession: NSObject, URLSessionDelegate {
     
     private let log = APINetworking.log
     
-    init(configuration: URLSessionConfiguration, authenticating: APIAuthenticating? = nil, pinning: APISessionPinning? = nil) {
+    public init(configuration: URLSessionConfiguration, authenticating: APIAuthenticating? = nil, pinning: APISessionPinning? = nil) {
         
         self.authenticating = authenticating
         self.pinning = APISessionPinner.create(pinning: pinning)
@@ -65,7 +70,7 @@ class APISession: NSObject, URLSessionDelegate {
                                      delegateQueue: OperationQueue.main)
     }
     
-    func execute(_ request: APIRequest) -> Promise<APIResponse> {
+    public func execute(_ request: APIRequest) -> Promise<APIResponse> {
      
         return execute_(request: request, callback: nil)
     }
@@ -164,7 +169,7 @@ class APISession: NSObject, URLSessionDelegate {
             
             self?.forget(request: request)
             
-            if error.domain == Error.tokenExpired.domain && error.code == Error.tokenExpired.errorCode {
+            if error.domain == InternalError.tokenExpired.domain && error.code == InternalError.tokenExpired.errorCode {
                 
                 self?.addAuthQueuedRequest(queuedRequest)
                 self?.refreshToken()
@@ -178,7 +183,7 @@ class APISession: NSObject, URLSessionDelegate {
     }
     
     /** ATM will attempt to cancel request - if request already completed -> will take no further action */
-    func cancel(request: APIRequest) {
+    public func cancel(request: APIRequest) {
         
         queue.async { [weak self] in
             self?.cancel_(request: request)
@@ -188,18 +193,18 @@ class APISession: NSObject, URLSessionDelegate {
     /** ATM will attempt to cancel request - if request already completed -> will take no further action */
     func cancel_(request: APIRequest) {
         
-        log?.log(message: "cancel request \(request.identifier)", type: .info)
+        log?.apiLog(message: "cancel request \(request.identifier)", type: .info)
         
         if let index = queuedRequests.firstIndex(where: { $0.ID == request.identifier }) {
             
             queuedRequests[index].callback.onError(Error.cancelled)
             queuedRequests.remove(at: index)
-            log?.log(message: "request cancelled (while inactive/queued) \(request.identifier)", type: .info)
+            log?.apiLog(message: "request cancelled (while inactive/queued) \(request.identifier)", type: .info)
             
         } else if let index = activeRequests.firstIndex(where: { $0.ID == request.identifier }) {
             
             activeRequests[index].sessionTask.cancel()
-            log?.log(message: "request cancelled (while active) \(request.identifier)", type: .info)
+            log?.apiLog(message: "request cancelled (while active) \(request.identifier)", type: .info)
         }
     }
         
@@ -208,8 +213,13 @@ class APISession: NSObject, URLSessionDelegate {
         let httpUrlResponse = urlResponse as? HTTPURLResponse
         let statusCode = httpUrlResponse?.statusCode
                 
+        var headers: APIHTTPHeaders?
+        if let allHttpHeaders = httpUrlResponse?.allHeaderFields as? [String: String] {
+            headers = APIHTTPHeaders(allHttpHeaders)
+        }
+        
         let rawResponse = APIRawResponse(status: statusCode,
-                                         headers: httpUrlResponse?.allHeaderFields as? APIRequest.HTTPHeaders ?? [:],
+                                         headers: headers ?? APIHTTPHeaders(),
                                          data: data)
         
         return Promise<APIRawResponse>.instantValue(rawResponse)
@@ -224,7 +234,7 @@ class APISession: NSObject, URLSessionDelegate {
             if request.authentication == .none {
                 return Promise<APIResponse>.instantError(Error.unauthorized)
             } else {
-                return Promise<APIResponse>.instantError(Error.tokenExpired)
+                return Promise<APIResponse>.instantError(InternalError.tokenExpired)
             }
             
         } else {
@@ -255,7 +265,7 @@ class APISession: NSObject, URLSessionDelegate {
 
     private func refreshToken() {
         
-        log?.log(message: "refresh token", type: .info)
+        log?.apiLog(message: "refresh token", type: .info)
         refreshTokenPending = true
         
         if let authenticating = authenticating {
@@ -272,7 +282,7 @@ class APISession: NSObject, URLSessionDelegate {
     
     private func didRefreshToken() {
         
-        log?.log(message: "did refresh token", type: .info)
+        log?.apiLog(message: "did refresh token", type: .info)
         refreshTokenPending = false
         queuedRequests.append(contentsOf: authQueuedRequests)
         authQueuedRequests.removeAll()
@@ -281,7 +291,7 @@ class APISession: NSObject, URLSessionDelegate {
     
     private func didFailToRefreshToken(error: Swift.Error) {
         
-        log?.log(message: "failed to refresh token (\(error)", type: .info)
+        log?.apiLog(message: "failed to refresh token (\(error)", type: .info)
         refreshTokenPending = false
         authQueuedRequests.forEach { $0.callback.onError(Error.cancelled) }
         authQueuedRequests.removeAll()
@@ -289,21 +299,19 @@ class APISession: NSObject, URLSessionDelegate {
         onAuthenitcationRequired?(error)
     }
     
-    private func createSessionHeaders(for request: APIRequest) -> Promise<APIRequest.HTTPHeaders> {
+    private func createSessionHeaders(for request: APIRequest) -> Promise<APIHTTPHeaders> {
     
         switch request.authentication {
-        case .none: return Promise<APIRequest.HTTPHeaders>.instantValue(APIRequest.HTTPHeaders())
+        case .none: return Promise<APIHTTPHeaders>.instantValue(APIHTTPHeaders())
         case .oauth:
     
             if let auth = authenticating {
 
-                return auth.getCurrentToken().map { token -> APIRequest.HTTPHeaders in
-                    
-                    let value = "Bearer \(token)"
-                    return ["authorization": value]
+                return auth.getCurrentToken().map { token in
+                    return APIHTTPHeaders(["authorization": "Bearer \(token.getAccessToken())"])
                 }
             } else {
-                return Promise<APIRequest.HTTPHeaders>.instantError(Error.unauthorized)
+                return Promise<APIHTTPHeaders>.instantError(Error.unauthorized)
             }
         }
     }
@@ -335,9 +343,9 @@ class APISession: NSObject, URLSessionDelegate {
     
     private func logOutgoing(request: APIRequest, sessionTask: APISessionTask) {
         
-        log?.log(message: "OUT: \(request.url.absoluteString) (\(request.method.rawValue))", type: .info)
-        log?.log(message: "OUT headers: \( request.getHeadersDescription())", type: .info)
-        log?.log(message: "OUT payload: \(sessionTask.getPayloadDescription())", type: .info)
+        log?.apiLog(message: "OUT: \(request.url.absoluteString) (\(request.method.rawValue))", type: .info)
+        log?.apiLog(message: "OUT headers: \( request.getHeadersDescription())", type: .info)
+        log?.apiLog(message: "OUT payload: \(sessionTask.getPayloadDescription())", type: .info)
     }
     
     private func logIncoming(request: APIRequest, data: Data?, urlResponse: URLResponse?) {
@@ -345,9 +353,9 @@ class APISession: NSObject, URLSessionDelegate {
         let httpUrlResponse = urlResponse as? HTTPURLResponse
         let code = httpUrlResponse?.statusCode
                 
-        log?.log(message: "IN: \(request.url.absoluteString) (\(request.method.rawValue)) - \(code ?? -1)", type: .info)
-        log?.log(message: "IN headers: \( urlResponse?.getHeadersDescription() ?? "--")", type: .info)
-        log?.log(message: "IN payload: \(getPayloadDescription(payload: data))", type: .info)
+        log?.apiLog(message: "IN: \(request.url.absoluteString) (\(request.method.rawValue)) - \(code ?? -1)", type: .info)
+        log?.apiLog(message: "IN headers: \( urlResponse?.getHeadersDescription() ?? "--")", type: .info)
+        log?.apiLog(message: "IN payload: \(getPayloadDescription(payload: data))", type: .info)
     }
     
     private func forget(request: APIRequest) {
@@ -371,7 +379,7 @@ class APISession: NSObject, URLSessionDelegate {
 
 extension APISession: URLSessionTaskDelegate {
     
-    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+    public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         
         guard let pinning = pinning else {
             completionHandler(.performDefaultHandling, nil); return
@@ -409,3 +417,4 @@ extension URLSession {
         }
     }
 }
+

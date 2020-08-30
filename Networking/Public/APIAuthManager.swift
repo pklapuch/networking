@@ -9,23 +9,23 @@
 import Foundation
 import PromiseKit
 
-class APIAuthManager: NSObject {
+public class APIAuthManager: NSObject {
     
-    enum Error: CustomNSError, LocalizedError {
+    public enum Error: CustomNSError, LocalizedError {
         
         case authenticationRequired
         case cancelled
         
-        static var errorDomain: String { return "APIAuthManager.Error" }
+        public static var errorDomain: String { return "APIAuthManager.Error" }
         
-        var errorCode: Int {
+        public var errorCode: Int {
             switch self {
             case .authenticationRequired: return 0
             case .cancelled: return 1
             }
         }
         
-        var errorDescription: String? {
+        public var errorDescription: String? {
             switch self {
             case .authenticationRequired: return "Authentication required"
             case .cancelled: return "Authentication cancelled"
@@ -41,12 +41,15 @@ class APIAuthManager: NSObject {
     private var isRefreshing = false
     private var failedAttempts = 0
     
-    init(authenticator: APITokenActionProtocol, store: APICredentialStoreProtocol) {
+    public init(authenticator: APITokenActionProtocol, store: APICredentialStoreProtocol) {
         self.authenticator = authenticator
         self.store = store
     }
+}
+
+extension APIAuthManager: APIAuthenticating {
     
-    func refresh() -> Promise<APISessionTokenProtocol> {
+    public func refresh() -> Promise<APISessionTokenProtocol> {
         
         return Promise<APISessionTokenProtocol> { resolver in
 
@@ -57,7 +60,7 @@ class APIAuthManager: NSObject {
         }
     }
     
-    func getCurrentToken() -> Promise<APISessionTokenProtocol> {
+    public func getCurrentToken() -> Promise<APISessionTokenProtocol> {
         
         return Promise<APISessionTokenProtocol> { resolver in
             
@@ -77,18 +80,18 @@ extension APIAuthManager {
 
         if isRefreshing  {
 
-            APINetworking.log?.log(message: "refresh token in progress -> wait", type: .info)
+            APINetworking.log?.apiLog(message: "refresh token in progress -> wait", type: .info)
 
         } else {
 
             if failedAttempts > 0 {
 
-                APINetworking.log?.log(message: "refresh token has failed too many times -> critial error", type: .info)
+                APINetworking.log?.apiLog(message: "refresh token has failed too many times -> critial error", type: .info)
                 notify(error: Error.authenticationRequired)
 
             } else {
 
-                APINetworking.log?.log(message: "execute refresh token", type: .info)
+                APINetworking.log?.apiLog(message: "execute refresh token", type: .info)
                 isRefreshing = true
                 executeRefresh()
             }
@@ -162,14 +165,14 @@ extension APIAuthManager {
 
         }.done(on: self.queue) { [weak self] newToken in
 
-            APINetworking.log?.log(message: "did refresh token", type: .info)
+            APINetworking.log?.apiLog(message: "did refresh token", type: .info)
             guard let self = self else { throw Error.cancelled}
             self.failedAttempts = 0
             self.notify(newToken: newToken)
 
         }.catch(on: self.queue) { [weak self] error in
 
-            APINetworking.log?.log(message: "did fail to refresh token", type: .info)
+            APINetworking.log?.apiLog(message: "did fail to refresh token", type: .info)
             guard let self = self else { return }
             
             self.failedAttempts += 1

@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol APISessionPinning {
+public protocol APISessionPinning {
     
     func evaluate(host: String, certificates: [Data]) -> Bool
 }

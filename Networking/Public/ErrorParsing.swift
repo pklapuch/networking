@@ -1,5 +1,5 @@
 //
-//  ErrorParsing.swift
+//  APIErrorParsing.swift
 //  Networking
 //
 //  Created by Pawel Klapuch on 27/08/2020.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol ErrorParsing {
+public protocol APIErrorParsing {
 
     func decode(data: Data) throws -> Codable?
 }

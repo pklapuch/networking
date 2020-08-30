@@ -8,9 +8,9 @@
 
 import Foundation
 
-struct APIRawResponse {
+public struct APIRawResponse {
 
-    let status: Int?
-    let headers: APIRequest.HTTPHeaders
-    let data: Data?
+    public let status: Int?
+    public let headers: APIHTTPHeaders
+    public let data: Data?
 }

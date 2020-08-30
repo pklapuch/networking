@@ -8,8 +8,8 @@
 
 import Foundation
 
-struct APIResponse {
+public struct APIResponse {
 
-    let raw: APIRawResponse
-    let model: Codable?
+    public let raw: APIRawResponse
+    public let model: Codable?
 }
