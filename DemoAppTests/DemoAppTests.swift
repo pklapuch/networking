@@ -1,15 +1,15 @@
 //
-//  NetworkingDemoTests.swift
-//  NetworkingDemoTests
+//  DemoAppTests.swift
+//  DemoAppTests
 //
-//  Created by Pawel Klapuch on 30/08/2020.
+//  Created by Pawel Klapuch on 31/08/2020.
 //  Copyright © 2020 Pawel Klapuch. All rights reserved.
 //
 
 import XCTest
-@testable import NetworkingDemo
+@testable import DemoApp
 
-class NetworkingDemoTests: XCTestCase {
+class DemoAppTests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
