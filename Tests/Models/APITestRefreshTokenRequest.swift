@@ -19,12 +19,13 @@ class APITestRefreshTokenRequest: APIRequest {
                       "grant_type": "refresh_token",
                       "client_id": "app-client"]
         
-        let headers = ["Content-Type": "application/x-www-form-urlencoded"]
+        let headers = APIHTTPHeaders(["Content-Type": "application/x-www-form-urlencoded"])
         
         try self.init(path: path,
                    method: .post,
                    payload: APIPayload.httpQuery(object),
                    headers: headers,
-                   modelParser: APITestTokenParser())
+                   modelParser: APITestTokenParser(),
+                   authentication: APIRequestAuthentication.none)
     }
 }

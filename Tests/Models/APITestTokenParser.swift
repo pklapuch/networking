@@ -9,7 +9,7 @@
 import Foundation
 @testable import Networking
 
-struct APITestTokenParser: ModelParsing {
+struct APITestTokenParser: APIModelParsing {
     
     func decode(data: Data) throws -> Codable? {
         

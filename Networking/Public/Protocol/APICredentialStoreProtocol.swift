@@ -7,11 +7,12 @@
 //
 
 import Foundation
-import PromiseKit
 
 public protocol APICredentialStoreProtocol {
 
-    func store(token: APISessionTokenProtocol) -> Promise<Void>
-    func token() -> Promise<APISessionTokenProtocol?>
-    func invalidate() -> Promise<Void>
+    func store(token: APISessionTokenProtocol, onSuccess:@escaping VoidBlock, onError:@escaping ErrorBlock)
+    
+    func token(onSuccess:@escaping OptionalTokenBlock, onError:@escaping ErrorBlock)
+    
+    func invalidate(onCompleted: VoidBlock)
 }

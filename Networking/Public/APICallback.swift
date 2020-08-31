@@ -12,13 +12,10 @@ extension APIRequest {
     
     public class APICallback {
         
-        typealias SuccessBlock = (APIResponse) -> Void
-        typealias ErrorBlock = (Swift.Error) -> Void
-        
-        let onSuccess: SuccessBlock
+        let onSuccess: ResponseBlock
         let onError: ErrorBlock
         
-        init(onSuccess:@escaping SuccessBlock, onError:@escaping ErrorBlock) {
+        init(onSuccess:@escaping ResponseBlock, onError:@escaping ErrorBlock) {
             
             self.onSuccess = onSuccess
             self.onError = onError

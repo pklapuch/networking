@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import PromiseKit
 
 public class APIAuthManager: NSObject {
     
@@ -49,34 +48,24 @@ public class APIAuthManager: NSObject {
 
 extension APIAuthManager: APIAuthenticating {
     
-    public func refresh() -> Promise<APISessionTokenProtocol> {
-        
-        return Promise<APISessionTokenProtocol> { resolver in
-
-            self.queue.async {
-
-                self.refreshOrQueue(resolver: resolver)
-            }
+    public func refresh(onSuccess:@escaping TokenBlock, onError:@escaping ErrorBlock) {
+        queue.async { [weak self] in
+            self?.refreshOrQueue(onSuccess: onSuccess, onError: onError)
         }
     }
     
-    public func getCurrentToken() -> Promise<APISessionTokenProtocol> {
-        
-        return Promise<APISessionTokenProtocol> { resolver in
-            
-            self.queue.async {
-                
-                self.getCurrentTokenOrQueue(resolver: resolver)
-            }
+    public func getCurrentToken(onSuccess:@escaping TokenBlock, onError:@escaping ErrorBlock) {
+        self.queue.async { [weak self] in
+            self?.getCurrentTokenOrQueue(onSuccess: onSuccess, onError: onError)
         }
     }
 }
 
 extension APIAuthManager {
     
-    private func refreshOrQueue(resolver: Resolver<APISessionTokenProtocol>) {
+    private func refreshOrQueue(onSuccess:@escaping TokenBlock, onError:@escaping ErrorBlock) {
 
-        queuedSessions.append(APIQueuedSession(resolver: resolver))
+        queuedSessions.append(APIQueuedSession(onSuccess: onSuccess, onError: onError))
 
         if isRefreshing  {
 
@@ -98,85 +87,94 @@ extension APIAuthManager {
         }
     }
     
-     private func notify(newToken: APISessionTokenProtocol) {
-
-         self.queue.async {
-
-             self.isRefreshing = false
-             self.queuedSessions.forEach { $0.resolver.fulfill(newToken) }
-             self.queuedSessions.removeAll()
-         }
-     }
-
-     private func notify(error: Swift.Error) {
-
-         self.queue.async {
-
-             self.isRefreshing = false
-             self.queuedSessions.forEach { $0.resolver.reject(error) }
-             self.queuedSessions.removeAll()
-         }
-     }
-    
-    private func getCurrentTokenOrQueue(resolver: Resolver<APISessionTokenProtocol>) {
+    private func getCurrentTokenOrQueue(onSuccess:@escaping TokenBlock, onError:@escaping ErrorBlock) {
 
         if isRefreshing {
-
-            queuedSessions.append(APIQueuedSession(resolver: resolver))
-
+            queuedSessions.append(APIQueuedSession(onSuccess: onSuccess, onError: onError))
         } else {
-
-            store.token().then { token in
-
-                self.authenticator.validate(token: token)
-
-            }.done { token in
-
-                resolver.fulfill(token)
-
-            }.catch { error in
-
-                resolver.reject(Error.authenticationRequired)
-            }
+            store.token(onSuccess: { [weak self] token in
+                self?.authenticator.validate(token: token, onSuccess: onSuccess, onError: onError)
+            }, onError: onError)
         }
     }
     
     private func executeRefresh() {
         
-        store.token().then { [weak self] token -> Promise<APISessionTokenProtocol> in
+        store.token(onSuccess: { [weak self] storedToken in
             
-            guard let self = self else { throw Error.cancelled}
-            return self.authenticator.validate(token: token)
-
-        }.then { [weak self] token -> Promise<APISessionTokenProtocol> in
+            if let storedToken = storedToken {
+                self?.didLoad(storedToken: storedToken)
+            } else {
+                self?.executeRefreshDidFail(with: Error.authenticationRequired)
+            }
+        }, onError: executeRefreshDidFail(with:))
+    }
+    
+    private func didLoad(storedToken: APISessionTokenProtocol) {
+        
+        authenticator.validate(token: storedToken, onSuccess: { [weak self] token in
+            self?.didValidate(storedToken: token)
+        }, onError: executeRefreshDidFail(with:))
+    }
+    
+    private func didValidate(storedToken: APISessionTokenProtocol) {
+    
+        authenticator.refresh(token: storedToken, onSuccess: { [weak self] token in
+            self?.didObtain(newToken: token)
+        }, onError: executeRefreshDidFail(with:))
+    }
+    
+    private func didObtain(newToken: APISessionTokenProtocol) {
+        
+        authenticator.validate(token: newToken, onSuccess: { [weak self] token in
+            self?.didValidate(newToken: token)
+        }, onError: executeRefreshDidFail(with:))
+    }
+        
+    private func didValidate(newToken: APISessionTokenProtocol) {
+     
+        store.store(token: newToken, onSuccess: { [weak self] in
+            self?.didStore(newToken: newToken)
+        }, onError: executeRefreshDidFail(with:))
+    }
+    
+    private func didStore(newToken: APISessionTokenProtocol) {
+        
+        queue.async { [weak self] in
             
-            guard let self = self else { throw Error.cancelled}
-            return self.authenticator.refresh(token: token)
-
-        }.then { [weak self] newToken -> Promise<APISessionTokenProtocol> in
-
-            guard let self = self else { throw Error.cancelled}
-            return self.authenticator.validate(token: newToken)
-
-        }.then { [weak self] newToken -> Promise<APISessionTokenProtocol> in
-
-            guard let self = self else { throw Error.cancelled}
-            return self.store.store(token: newToken).map { newToken }
-
-        }.done(on: self.queue) { [weak self] newToken in
-
             APINetworking.log?.apiLog(message: "did refresh token", type: .info)
-            guard let self = self else { throw Error.cancelled}
-            self.failedAttempts = 0
-            self.notify(newToken: newToken)
-
-        }.catch(on: self.queue) { [weak self] error in
-
-            APINetworking.log?.apiLog(message: "did fail to refresh token", type: .info)
-            guard let self = self else { return }
+            self?.failedAttempts = 0
+            self?.notify(newToken: newToken)
+        }
+    }
+    
+    private func executeRefreshDidFail(with error: Swift.Error) {
+        
+        queue.async { [weak self] in
             
-            self.failedAttempts += 1
-            self.notify(error: error)
+            APINetworking.log?.apiLog(message: "did fail to refresh token", type: .info)
+            self?.failedAttempts += 1
+            self?.notify(error: error)
+        }
+    }
+    
+    private func notify(newToken: APISessionTokenProtocol) {
+
+        self.queue.async {
+
+            self.isRefreshing = false
+            self.queuedSessions.forEach { $0.onSuccess(newToken) }
+            self.queuedSessions.removeAll()
+        }
+    }
+
+    private func notify(error: Swift.Error) {
+
+        self.queue.async {
+
+            self.isRefreshing = false
+            self.queuedSessions.forEach { $0.onError(error) }
+            self.queuedSessions.removeAll()
         }
     }
 }

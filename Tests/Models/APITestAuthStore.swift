@@ -7,36 +7,30 @@
 //
 
 import Foundation
-import PromiseKit
 @testable import Networking
 
 class APITestAuthStore: NSObject, APICredentialStoreProtocol {
-    
+
     var storedToken: APISessionTokenProtocol?
     
     init(token: APISessionTokenProtocol? = nil) {
         self.storedToken = token
     }
     
-    func store(token: APISessionTokenProtocol) -> Promise<Void> {
-     
-        return Promise<Void> { r in
-            self.storedToken = token
-            r.fulfill_()
-        }
-    }
-    
-    func token() -> Promise<APISessionTokenProtocol?> {
+    func store(token: APISessionTokenProtocol, onSuccess:@escaping VoidBlock, onError:@escaping ErrorBlock) {
         
-        return Promise<APISessionTokenProtocol?> { r in
-            r.fulfill(storedToken)
-        }
+        self.storedToken = token
+        onSuccess()
     }
     
-    func invalidate() -> Promise<Void> {
-        return Promise<Void> { r in
-            self.storedToken = nil
-            r.fulfill_()
-        }
+    func token(onSuccess:@escaping OptionalTokenBlock, onError:@escaping ErrorBlock) {
+        
+        onSuccess(storedToken)
+    }
+    
+    func invalidate(onCompleted: VoidBlock) {
+
+        self.storedToken = nil
+        onCompleted()
     }
 }

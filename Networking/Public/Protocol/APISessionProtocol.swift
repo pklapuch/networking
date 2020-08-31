@@ -7,9 +7,8 @@
 //
 
 import Foundation
-import PromiseKit
 
 public protocol APISessionProtocol {
 
-    func execute(_ request: APIRequest) -> Promise<APIResponse>
+    func execute(_ request: APIRequest, onSuccess:@escaping ResponseBlock, onError: @escaping ErrorBlock)
 }

@@ -7,11 +7,10 @@
 //
 
 import Foundation
-import PromiseKit
 
 public protocol APIAuthenticating {
 
-    func refresh() -> Promise<APISessionTokenProtocol>
+    func refresh(onSuccess:@escaping TokenBlock, onError:@escaping ErrorBlock)
     
-    func getCurrentToken() -> Promise<APISessionTokenProtocol>
+    func getCurrentToken(onSuccess:@escaping TokenBlock, onError:@escaping ErrorBlock)
 }

@@ -12,4 +12,5 @@ public enum APIPayload {
     
     case plainJSON([String : Any])
     case httpQuery([String : Any])
+    case custom(Data)
 }

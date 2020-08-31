@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import PromiseKit
 @testable import Networking
 
 class APITestAuthenticator: NSObject, APITokenActionProtocol {
@@ -34,59 +33,65 @@ class APITestAuthenticator: NSObject, APITokenActionProtocol {
         self.session = session
     }
     
-    func authenticate(credential: APIAuthCredential) -> Promise<APISessionTokenProtocol> {
-        
+    func authenticate(credential: APIAuthCredential, onSuccess:@escaping TokenBlock, onError:@escaping ErrorBlock) {
+    
         do {
             
             let request = try APITestAuthenticateRequest(credential: credential)
-            return session.execute(request).map { response -> APISessionTokenProtocol in
+            
+            session.execute(request, onSuccess: { response in
                 
                 if let token = response.model as? APITestSessionToken {
-                    return token
+                    onSuccess(token)
                 } else {
-                    throw Error.invalidResponse
+                    onError(Error.invalidResponse)
                 }
-            }
+                
+            }, onError: onError)
             
         } catch {
-            return Promise<APISessionTokenProtocol>.instantError(error)
+            
+            return onError(error)
         }
     }
-    
-    func refresh(token: APISessionTokenProtocol) -> Promise<APISessionTokenProtocol> {
+
+    func refresh(token: APISessionTokenProtocol, onSuccess:@escaping TokenBlock, onError:@escaping ErrorBlock) {
                    
         do {
             
             let request = try APITestRefreshTokenRequest(token: token)
-            return session.execute(request).then { resposne in
-                self.extract(from: resposne)
-            }
+            
+            session.execute(request, onSuccess: { response in
+                
+                if let token = response.model as? APITestSessionToken {
+                    onSuccess(token)
+                } else {
+                    onError(Error.invalidResponse)
+                }
+                
+            }, onError: onError)
             
         } catch {
-            return Promise<APISessionTokenProtocol>.instantError(error)
+            
+            return onError(error)
         }
     }
     
-    func extract(from response: APIResponse) -> Promise<APISessionTokenProtocol> {
-        
-        return Promise<APISessionTokenProtocol> { r in
-            if let token = response.model as? APITestSessionToken {
-                r.fulfill(token)
-            } else {
-                r.reject(Error.invalidResponse)
-            }
+    func extract(from response: APIResponse, onSuccess:@escaping TokenBlock, onError:@escaping ErrorBlock) {
+    
+        if let token = response.model as? APITestSessionToken {
+            onSuccess(token)
+        } else {
+            onError(Error.invalidResponse)
         }
     }
     
-    func validate(token: APISessionTokenProtocol?) -> Promise<APISessionTokenProtocol> {
+    func validate(token: APISessionTokenProtocol?, onSuccess:@escaping TokenBlock, onError:@escaping ErrorBlock) {
         
-        return Promise<APISessionTokenProtocol> { r in
-         
-            if let token = token {
-                r.fulfill(token)
-            } else {
-                r.reject(Error.invalidToken)
-            }
+        if let token = token {
+            onSuccess(token)
+        } else {
+            onError(Error.invalidToken)
         }
     }
 }

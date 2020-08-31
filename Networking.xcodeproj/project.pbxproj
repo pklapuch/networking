@@ -17,7 +17,6 @@
 		3557E83124FAE0490037ED43 /* APILogging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3557E83024FAE0490037ED43 /* APILogging.swift */; };
 		3557E83424FAE2500037ED43 /* APITokenActionProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3557E83324FAE2500037ED43 /* APITokenActionProtocol.swift */; };
 		3557E83624FAE3750037ED43 /* APIRequestAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3557E83524FAE3750037ED43 /* APIRequestAuthentication.swift */; };
-		3557E83C24FAFA310037ED43 /* Promise+Wrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3557E83B24FAFA310037ED43 /* Promise+Wrapper.swift */; };
 		3557E83E24FB03700037ED43 /* APICallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3557E83D24FB036F0037ED43 /* APICallback.swift */; };
 		3561618324F8001B00853505 /* APINetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3561618224F8001B00853505 /* APINetworking.swift */; };
 		3561618C24F8005F00853505 /* APISession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3561618B24F8005F00853505 /* APISession.swift */; };
@@ -42,9 +41,7 @@
 		357C8D7D24FB1417001D012C /* TestAPILogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 357C8D7C24FB1417001D012C /* TestAPILogger.swift */; };
 		357C8D8024FB18D0001D012C /* APIQueuedRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 357C8D7F24FB18D0001D012C /* APIQueuedRequest.swift */; };
 		357C8D8224FBF2BD001D012C /* APISessionTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 357C8D8124FBF2BD001D012C /* APISessionTask.swift */; };
-		35E0FC5624FC200E008D2935 /* PromiseKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35E0FC5524FC200D008D2935 /* PromiseKit.framework */; };
-		35E0FC5724FC2024008D2935 /* PromiseKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35E0FC5524FC200D008D2935 /* PromiseKit.framework */; };
-		35E0FC5824FC202B008D2935 /* PromiseKit.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 35E0FC5524FC200D008D2935 /* PromiseKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		35A3548924FD929F004E0D65 /* Blocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35A3548824FD929F004E0D65 /* Blocks.swift */; };
 		35E0FC5A24FC2072008D2935 /* APIAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35E0FC5924FC2072008D2935 /* APIAuthManager.swift */; };
 		35E0FC5C24FC20A7008D2935 /* APIAuthCredential.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35E0FC5B24FC20A7008D2935 /* APIAuthCredential.swift */; };
 		35E0FC6024FC2224008D2935 /* APICredentialStoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35E0FC5F24FC2224008D2935 /* APICredentialStoreProtocol.swift */; };
@@ -101,16 +98,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		357C8D7A24FB130F001D012C /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				35E0FC5824FC202B008D2935 /* PromiseKit.framework in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -124,7 +111,6 @@
 		3557E83024FAE0490037ED43 /* APILogging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APILogging.swift; sourceTree = "<group>"; };
 		3557E83324FAE2500037ED43 /* APITokenActionProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APITokenActionProtocol.swift; sourceTree = "<group>"; };
 		3557E83524FAE3750037ED43 /* APIRequestAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIRequestAuthentication.swift; sourceTree = "<group>"; };
-		3557E83B24FAFA310037ED43 /* Promise+Wrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Promise+Wrapper.swift"; sourceTree = "<group>"; };
 		3557E83D24FB036F0037ED43 /* APICallback.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APICallback.swift; sourceTree = "<group>"; };
 		3561617F24F8001B00853505 /* libNetworking.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libNetworking.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3561618224F8001B00853505 /* APINetworking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APINetworking.swift; sourceTree = "<group>"; };
@@ -151,7 +137,7 @@
 		357C8D7C24FB1417001D012C /* TestAPILogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestAPILogger.swift; sourceTree = "<group>"; };
 		357C8D7F24FB18D0001D012C /* APIQueuedRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIQueuedRequest.swift; sourceTree = "<group>"; };
 		357C8D8124FBF2BD001D012C /* APISessionTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APISessionTask.swift; sourceTree = "<group>"; };
-		35E0FC5524FC200D008D2935 /* PromiseKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PromiseKit.framework; path = Carthage/Build/iOS/PromiseKit.framework; sourceTree = "<group>"; };
+		35A3548824FD929F004E0D65 /* Blocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Blocks.swift; sourceTree = "<group>"; };
 		35E0FC5924FC2072008D2935 /* APIAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIAuthManager.swift; sourceTree = "<group>"; };
 		35E0FC5B24FC20A7008D2935 /* APIAuthCredential.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIAuthCredential.swift; sourceTree = "<group>"; };
 		35E0FC5F24FC2224008D2935 /* APICredentialStoreProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APICredentialStoreProtocol.swift; sourceTree = "<group>"; };
@@ -172,7 +158,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				35E0FC5624FC200E008D2935 /* PromiseKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -180,7 +165,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				35E0FC5724FC2024008D2935 /* PromiseKit.framework in Frameworks */,
 				3561619624F800E800853505 /* libNetworking.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -242,7 +226,6 @@
 			children = (
 				356161C524F9B2FA00853505 /* Data+Hex.swift */,
 				356161B924F824B800853505 /* JSONUtility.swift */,
-				3557E83B24FAFA310037ED43 /* Promise+Wrapper.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -250,7 +233,6 @@
 		3557E83724FAF8F60037ED43 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				35E0FC5524FC200D008D2935 /* PromiseKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -290,6 +272,7 @@
 				3557E83224FAE1D60037ED43 /* Shared */,
 				3536141D24FBF70700399906 /* Extension */,
 				3557E82B24FADD530037ED43 /* Protocol */,
+				35A3548824FD929F004E0D65 /* Blocks.swift */,
 				356161B524F8208100853505 /* APIResponse.swift */,
 				3561618B24F8005F00853505 /* APISession.swift */,
 				3561619E24F802CD00853505 /* APIRequest.swift */,
@@ -408,7 +391,6 @@
 			buildPhases = (
 				3561618D24F800E800853505 /* Sources */,
 				3561618E24F800E800853505 /* Frameworks */,
-				357C8D7A24FB130F001D012C /* CopyFiles */,
 				3561618F24F800E800853505 /* Resources */,
 			);
 			buildRules = (
@@ -476,7 +458,6 @@
 				356161BA24F824B800853505 /* JSONUtility.swift in Sources */,
 				356161A524F804A300853505 /* APIPayload.swift in Sources */,
 				356161A124F8037E00853505 /* HTTPMethod.swift in Sources */,
-				3557E83C24FAFA310037ED43 /* Promise+Wrapper.swift in Sources */,
 				3557E83124FAE0490037ED43 /* APILogging.swift in Sources */,
 				3557E83E24FB03700037ED43 /* APICallback.swift in Sources */,
 				3561618C24F8005F00853505 /* APISession.swift in Sources */,
@@ -508,6 +489,7 @@
 				3557E83424FAE2500037ED43 /* APITokenActionProtocol.swift in Sources */,
 				356161BE24F9921700853505 /* APIPayload+Serializer.swift in Sources */,
 				3557E82324FAB61A0037ED43 /* APISessionPinner.swift in Sources */,
+				35A3548924FD929F004E0D65 /* Blocks.swift in Sources */,
 				356161BC24F82E4600853505 /* JSONPayloadSerializer.swift in Sources */,
 				356161A924F8071D00853505 /* APIRawResponse.swift in Sources */,
 			);

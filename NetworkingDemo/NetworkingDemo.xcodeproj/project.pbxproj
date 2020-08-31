@@ -16,8 +16,6 @@
 		357ADD8524FC6AB60093E565 /* NetworkingDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 357ADD8424FC6AB60093E565 /* NetworkingDemoTests.swift */; };
 		357ADD9924FC6BAC0093E565 /* libNetworking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 357ADD9824FC6BAC0093E565 /* libNetworking.a */; };
 		357ADD9A24FC6BB60093E565 /* libNetworking.a in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 357ADD9824FC6BAC0093E565 /* libNetworking.a */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		357ADD9C24FC6C490093E565 /* PromiseKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 357ADD9B24FC6C490093E565 /* PromiseKit.framework */; };
-		357ADD9D24FC6C4E0093E565 /* PromiseKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 357ADD9B24FC6C490093E565 /* PromiseKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,7 +35,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				357ADD9D24FC6C4E0093E565 /* PromiseKit.framework in Embed Frameworks */,
 				357ADD9A24FC6BB60093E565 /* libNetworking.a in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -66,7 +63,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				357ADD9C24FC6C490093E565 /* PromiseKit.framework in Frameworks */,
 				357ADD9924FC6BAC0093E565 /* libNetworking.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

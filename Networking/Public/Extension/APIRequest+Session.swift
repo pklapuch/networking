@@ -7,48 +7,26 @@
 //
 
 import Foundation
-import PromiseKit
-
-extension APIRequest.APICallback {
-    
-    static func create(with resolver: Resolver<APIResponse>) -> APIRequest.APICallback {
-        return APIRequest.APICallback(onSuccess: { response in
-            resolver.fulfill(response)
-        }) { error in
-            resolver.reject(error)
-        }
-    }
-}
 
 extension APIRequest {
-        
-    func createURLRequest(sessionHeaders: APIHTTPHeaders? = nil) -> Promise<URLRequest> {
+    
+    func urlRequest(with sessionHeaders: APIHTTPHeaders? = nil) throws -> URLRequest {
      
-        return Promise<URLRequest> { r in
-            
-            do {
-                
-                var urlRequset = URLRequest(url: url,
-                                            cachePolicy: policy,
-                                            timeoutInterval: TimeInterval(timeout))
-                
-                urlRequset.httpMethod = method.rawValue
-                sessionHeaders?.forEach { urlRequset.setValue($0.value, forHTTPHeaderField: $0.name) }
-                headers.forEach { urlRequset.setValue($0.value, forHTTPHeaderField: $0.name) }
-                urlRequset.httpBody = try payload?.encode()
-                
-                r.fulfill(urlRequset)
-                
-            } catch {
-                
-                r.reject(error)
-            }
-        }
+        var request = URLRequest(url: url,
+                                    cachePolicy: policy,
+                                    timeoutInterval: TimeInterval(timeout))
+        
+        request.httpMethod = method.rawValue
+        sessionHeaders?.forEach { request.setValue($0.value, forHTTPHeaderField: $0.name) }
+        headers.forEach { request.setValue($0.value, forHTTPHeaderField: $0.name) }
+        request.httpBody = try payload?.encode()
+        
+        return request
     }
     
-    func parse(data: Data, httpCode: APIHttpCode) throws -> Codable? {
+    func parse(data: Data, httpGroupCode: APIHTTPGroupCode) throws -> Codable? {
      
-        switch httpCode {
+        switch httpGroupCode {
 
         case .group2xx: return try parseModel(data: data)
         case .group3xx, .unknown: return nil

@@ -7,14 +7,15 @@
 //
 
 import Foundation
-import PromiseKit
 
 class APIQueuedSession: NSObject {
-
-    let resolver: Resolver<APISessionTokenProtocol>
     
-    init(resolver: Resolver<APISessionTokenProtocol>) {
+    let onSuccess: TokenBlock
+    let onError: ErrorBlock
+    
+    init(onSuccess:@escaping TokenBlock, onError:@escaping ErrorBlock) {
         
-        self.resolver = resolver
+        self.onSuccess = onSuccess
+        self.onError = onError
     }
 }

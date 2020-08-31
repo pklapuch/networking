@@ -16,37 +16,41 @@ class Tests: XCTestCase {
     func test() throws {
         
         expectation = XCTestExpectation(description: "session")
-        let request = APIRequest(url: URL(string: "https://learnappmaking.com/ex/users.json")!,
-                                 method: .get,
-                                 payload: nil,
-                                 headers: APIRequest.HTTPHeaders(),
-                                 modelParser: TestModelParser(),
-                                 errorParser: TestErrorParser())
+        APINetworking.log = TestAPILogger()
+        
+        let body = ["username": "pawel",
+                    "password": "secret"]
+        
+        let request = APIRequest(url: URL(string: "https://pawelklapuch.pl/testAPI")!,
+                                 method: .post,
+                                 payload: .plainJSON(body),
+                                 headers: APIHTTPHeaders(),
+                                 authentication: APIRequestAuthentication.none)
         
         let session = APISession(configuration: URLSessionConfiguration.default)
-        session.execute(request).done { response in
+        session.execute(request, onSuccess: { response in
             self.expectation.fulfill()
-        }.catch { error in
+        }) { _ in
             XCTFail()
         }
-
+        
         wait(for: [expectation], timeout: 5)
     }
 }
 
-extension Tests {
-    
-    fileprivate class TestModelParser: ModelParsing {
-        func decode(data: Data) throws -> Codable? {
-            
-            return try JSONUtility.decodeArray(data: data, type: User.self)
-        }
-    }
-    
-    fileprivate class TestErrorParser: ErrorParsing {
-        func decode(data: Data) throws -> Codable? {
-            
-            return try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) as? Codable
-        }
-    }
-}
+//extension Tests {
+//
+//    fileprivate class TestModelParser: ModelParsing {
+//        func decode(data: Data) throws -> Codable? {
+//
+//            return try JSONUtility.decodeArray(data: data, type: User.self)
+//        }
+//    }
+//
+//    fileprivate class TestErrorParser: ErrorParsing {
+//        func decode(data: Data) throws -> Codable? {
+//
+//            return try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) as? Codable
+//        }
+//    }
+//}

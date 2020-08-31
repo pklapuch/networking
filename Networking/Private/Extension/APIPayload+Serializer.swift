@@ -19,6 +19,9 @@ extension APIPayload {
             
         case .httpQuery(let object):
             return try HTTPQuerySerializer().encode(object: object)
+            
+        case .custom(let data):
+            return data
         }
     }
 }

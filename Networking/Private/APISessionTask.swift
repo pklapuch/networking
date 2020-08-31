@@ -7,14 +7,14 @@
 //
 
 import Foundation
-import PromiseKit
 
 class APISessionTask: NSObject {
     
     var task: URLSessionTask? = nil
-    var resolver: Resolver<(Data?, URLResponse?)>?
+    var onSuccess: URLResponseBlock?
+    var onError: ErrorBlock?
     var cancelled: Bool
-    
+        
     init(request: URLRequest, session: URLSession) {
         
         cancelled = false
@@ -25,13 +25,11 @@ class APISessionTask: NSObject {
         }
     }
     
-    typealias RET = (Data?, URLResponse?)
-    func resume() -> Promise<RET> {
+    func resume(onSuccess:@escaping URLResponseBlock, onError:@escaping ErrorBlock) {
         
-        return Promise<RET> { [weak self] r in
-            self?.resolver = r
-            self?.task?.resume()
-        }
+        self.onSuccess = onSuccess
+        self.onError = onError
+        self.task?.resume()
     }
     
     func cancel() {
@@ -43,9 +41,9 @@ class APISessionTask: NSObject {
     private func taskDidComplete(data: Data?, urlResponse: URLResponse?, error: Swift.Error?) {
         
         if let error = error {
-            resolver?.reject(error)
+            onError?(error)
         } else {
-            resolver?.fulfill((data, urlResponse))
+            onSuccess?((data, urlResponse))
         }
     }
     

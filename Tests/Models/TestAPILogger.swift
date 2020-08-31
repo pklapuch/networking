@@ -11,7 +11,7 @@ import Foundation
 
 class TestAPILogger: NSObject, APILogging {
 
-    func log(message: String, type: APILoggingType) {
+    func apiLog(message: String, type: APILoggingType) {
         
         print("\(message)")
     }

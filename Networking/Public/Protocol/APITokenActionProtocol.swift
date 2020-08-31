@@ -7,15 +7,14 @@
 //
 
 import Foundation
-import PromiseKit
 
 public protocol APITokenActionProtocol {
     
-    func authenticate(credential: APIAuthCredential) -> Promise<APISessionTokenProtocol>
+    func authenticate(credential: APIAuthCredential, onSuccess:@escaping TokenBlock, onError:@escaping ErrorBlock)
     
-    func refresh(token: APISessionTokenProtocol) -> Promise<APISessionTokenProtocol>
+    func refresh(token: APISessionTokenProtocol, onSuccess:@escaping TokenBlock, onError:@escaping ErrorBlock)
     
-    func extract(from response: APIResponse) -> Promise<APISessionTokenProtocol>
+    func extract(from response: APIResponse, onSuccess:@escaping TokenBlock, onError:@escaping ErrorBlock)
     
-    func validate(token: APISessionTokenProtocol?) -> Promise<APISessionTokenProtocol>
+    func validate(token: APISessionTokenProtocol?, onSuccess:@escaping TokenBlock, onError:@escaping ErrorBlock)
 }
