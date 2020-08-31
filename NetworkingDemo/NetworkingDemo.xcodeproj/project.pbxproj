@@ -55,7 +55,6 @@
 		357ADD8424FC6AB60093E565 /* NetworkingDemoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingDemoTests.swift; sourceTree = "<group>"; };
 		357ADD8624FC6AB60093E565 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		357ADD9824FC6BAC0093E565 /* libNetworking.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libNetworking.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		357ADD9B24FC6C490093E565 /* PromiseKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PromiseKit.framework; path = Carthage/Build/iOS/PromiseKit.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,7 +121,6 @@
 		357ADD8F24FC6AE10093E565 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				357ADD9B24FC6C490093E565 /* PromiseKit.framework */,
 				357ADD9824FC6BAC0093E565 /* libNetworking.a */,
 			);
 			name = Frameworks;
