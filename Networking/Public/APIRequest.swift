@@ -36,14 +36,14 @@ open class APIRequest: NSObject {
     let timeout: Int
     let authentication: APIRequestAuthentication
     var modelParser: APIModelParsing?
-    var errorParser: APIErrorParsing?
+    var errorParser: APIModelParsing?
     
     public convenience init(path: String,
                      method: HTTPMethod,
                      payload: APIPayload?,
                      headers: APIHTTPHeaders,
                      modelParser: APIModelParsing? = nil,
-                     errorParser: APIErrorParsing? = nil,
+                     errorParser: APIModelParsing? = nil,
                      authentication: APIRequestAuthentication? = nil,
                      policy: URLRequest.CachePolicy? = nil,
                      timeout: Int? = nil) throws {
@@ -65,7 +65,7 @@ open class APIRequest: NSObject {
          payload: APIPayload?,
          headers: APIHTTPHeaders,
          modelParser: APIModelParsing? = nil,
-         errorParser: APIErrorParsing? = nil,
+         errorParser: APIModelParsing? = nil,
          authentication: APIRequestAuthentication? = nil,
          policy: URLRequest.CachePolicy? = nil,
          timeout: Int? = nil) {
