@@ -27,8 +27,8 @@ open class APIRequest: NSObject {
         static let defaultTimeoutSeconds = 60
     }
     
-    let identifier: String
-    let url: URL
+    public let identifier: String
+    public let url: URL
     let method: HTTPMethod
     let payload: APIPayload?
     let headers: APIHTTPHeaders
