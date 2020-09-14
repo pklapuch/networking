@@ -18,8 +18,8 @@ class Tests: XCTestCase {
         expectation = XCTestExpectation(description: "session")
         APINetworking.log = TestAPILogger()
         
-        let body = ["username": "pawel",
-                    "password": "secret"]
+        let body = ["username": "tester",
+                    "password": "password"]
         
         let request = APIRequest(url: URL(string: "https://pawelklapuch.pl/testAPI")!,
                                  method: .post,
