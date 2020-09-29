@@ -314,7 +314,7 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
     private func logOutgoing(request: APIRequest, sessionTask: APISessionTask) {
         
         APINetworking.log?.apiLog(message: "OUT: \(request.url.absoluteString) (\(request.method.rawValue))", type: .info)
-        APINetworking.log?.apiLog(message: "OUT headers: \( request.getHeadersDescription())", type: .info)
+        APINetworking.log?.apiLog(message: "OUT headers: \( sessionTask.urlRequest.getHeadersDescription())", type: .info)
         APINetworking.log?.apiLog(message: "OUT payload: \(sessionTask.getPayloadDescription())", type: .info)
     }
     

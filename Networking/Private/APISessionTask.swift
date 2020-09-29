@@ -11,6 +11,7 @@ import Foundation
 class APISessionTask: NSObject {
     
     var task: URLSessionTask? = nil
+    var urlRequest: URLRequest
     var onSuccess: URLResponseBlock?
     var onError: ErrorBlock?
     var cancelled: Bool
@@ -18,6 +19,7 @@ class APISessionTask: NSObject {
     init(request: URLRequest, session: URLSession) {
         
         cancelled = false
+        urlRequest = request
         super.init()
         
         task = session.dataTask(with: request) { [weak self] (data, urlResopnse, error) in
