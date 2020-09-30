@@ -55,6 +55,7 @@ class APISessionTask: NSObject {
         guard let request = task.currentRequest else { return "" }
         guard let data = request.httpBody else { return "--" }
         
+        
         var formattedJSON: String?
         if let json = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) {
             if let prettyData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
@@ -62,6 +63,19 @@ class APISessionTask: NSObject {
             }
         }
         
-        return formattedJSON ?? String(data: data, encoding: .utf8) ?? data.hexString
+        if let formattedJSON = formattedJSON {
+            return formattedJSON
+        }
+        
+        if data.count < 400 {
+            
+            if let value = String(data: data, encoding: .utf8), !value.isEmpty {
+                return value
+            } else {
+                return data.hexString
+            }
+        } else {
+            return "\(data.count) bytes"
+        }
     }
 }
