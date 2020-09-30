@@ -301,13 +301,15 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
         }
     }
     
-    /** LOG -  IN & OUT */
+    /** LOG -  IN */
     private func getPayloadDescription(payload: Data?) -> String {
         
         var formattedJSON: String?
+        var bytes: Int = 0
         
         if let data = payload {
             
+            bytes = data.count
             if let json = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) {
                 if let prettyData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
                     formattedJSON = String(data: prettyData, encoding: .utf8)
@@ -317,10 +319,16 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
             if (formattedJSON == nil) {
                 formattedJSON = String(data: data, encoding: .utf8)
             }
+            
+            if (formattedJSON == nil) {
+                formattedJSON = data.hexString
+            }
         }
         
         if let formattedJSON = formattedJSON {
-            return "\(formattedJSON)"
+            var output = "\(formattedJSON.prefix(400))"
+            if formattedJSON.count > 400 { output.append("... (total bytes: \(bytes))") }
+            return output
         } else {
             return "--"
         }

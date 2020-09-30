@@ -10,10 +10,14 @@ import Foundation
 
 class APISessionTask: NSObject {
     
-    var task: URLSessionTask? = nil
-    var urlRequest: URLRequest
     var onSuccess: URLResponseBlock?
     var onError: ErrorBlock?
+    
+    // TODO:
+    // Add delegate for payload obfuscation etc...
+    
+    var task: URLSessionTask? = nil
+    var urlRequest: URLRequest
     var cancelled: Bool
         
     init(request: URLRequest, session: URLSession) {
@@ -49,6 +53,7 @@ class APISessionTask: NSObject {
         }
     }
     
+    /** LOG -  OUT */
     func getPayloadDescription() -> String {
         
         guard let task = task else { return "--" }
@@ -56,12 +61,29 @@ class APISessionTask: NSObject {
         guard let data = request.httpBody else { return "--" }
         
         var formattedJSON: String?
+        
         if let json = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) {
             if let prettyData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
                 formattedJSON = String(data: prettyData, encoding: .utf8)
             }
         }
         
-        return formattedJSON ?? String(data: data, encoding: .utf8) ?? data.hexString
+        if (formattedJSON == nil) {
+            formattedJSON = String(data: data, encoding: .utf8)
+        }
+        
+        if (formattedJSON == nil) {
+            formattedJSON = data.hexString
+        }
+        
+        if let formattedJSON = formattedJSON {
+            
+            var output = "\(formattedJSON.prefix(400))"
+            if formattedJSON.count > 400 { output.append("... (total bytes: \(data.count))") }
+            return output
+            
+        } else {
+            return "--"
+        }
     }
 }
