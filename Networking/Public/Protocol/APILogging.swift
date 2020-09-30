@@ -10,6 +10,8 @@ import Foundation
 
 public enum APILoggingType {
     
+    case debug
+    
     case info
     
     case error
