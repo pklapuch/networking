@@ -17,6 +17,7 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
         case cancelled
         case duplicatedRequest
         case unauthorized
+        case backend(String)
     
         public static var errorDomain: String { "APISession.Error" }
         public var errorCode: Int {
@@ -24,6 +25,7 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
             case .cancelled: return 1
             case .duplicatedRequest: return 2
             case .unauthorized: return 3
+            case .backend(_): return 4
             }
         }
         
@@ -32,6 +34,7 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
             case .cancelled: return "cancelled"
             case .duplicatedRequest: return "duplicated request"
             case .unauthorized: return "unauthorized"
+            case .backend(let message): return "backend: \(message)"
             }
         }
     }
@@ -150,23 +153,35 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
         
         guard rawResponse.status != 401 else {
             
-            if queuedRequest.request.authentication == .none {
-                request(queuedRequest, didFailWithError: Error.unauthorized)
-            } else {
-                request(queuedRequest, didFailWithError: InternalError.tokenExpired)
-            }
+            let error: Swift.Error = queuedRequest.request.authentication == .none ? Error.unauthorized : InternalError.tokenExpired
+            request(queuedRequest, didFailWithError: error)
             return
         }
         
         let httpGroupCode = APIHTTPGroupCode.create(from: rawResponse.status)
         
-        guard let data = rawResponse.data else {
-            request(queuedRequest, didFinishWithResponse: APIResponse(raw: rawResponse, model: nil)); return
+        if httpGroupCode == .group3xx {
+            request(queuedRequest, didFinishWithResponse: APIResponse(raw: rawResponse, model: nil))
+            return
+        }
+        
+        if httpGroupCode == .group2xx {
+            
+            do {
+                let model = try queuedRequest.request.parse(data: rawResponse.data ?? Data(), httpGroupCode: httpGroupCode)
+                request(queuedRequest, didFinishWithResponse: APIResponse(raw: rawResponse, model: model))
+            } catch {
+                request(queuedRequest, didFailWithError: error)
+            }
+            return
         }
         
         do {
-            let model = try queuedRequest.request.parse(data: data, httpGroupCode: httpGroupCode)
-            request(queuedRequest, didFinishWithResponse: APIResponse(raw: rawResponse, model: model))
+            if let errorModel = try queuedRequest.request.parse(data: rawResponse.data ?? Data(), httpGroupCode: httpGroupCode) {
+                request(queuedRequest, didFailWithError: Error.backend(String(describing: errorModel)))
+            } else {
+                request(queuedRequest, didFailWithError: Error.backend("unknown"))
+            }
         } catch {
             request(queuedRequest, didFailWithError: error)
         }
