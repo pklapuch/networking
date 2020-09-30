@@ -60,6 +60,7 @@ class APISessionTask: NSObject {
         guard let request = task.currentRequest else { return "" }
         guard let data = request.httpBody else { return "--" }
         
+        
         var formattedJSON: String?
         
         if let json = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) {
@@ -69,7 +70,9 @@ class APISessionTask: NSObject {
         }
         
         if (formattedJSON == nil) {
-            formattedJSON = String(data: data, encoding: .utf8)
+            if let tmp = String(data: data, encoding: .utf8), !tmp.isEmpty {
+                formattedJSON = tmp
+            }
         }
         
         if (formattedJSON == nil) {

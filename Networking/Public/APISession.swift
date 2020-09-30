@@ -317,7 +317,9 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
             }
             
             if (formattedJSON == nil) {
-                formattedJSON = String(data: data, encoding: .utf8)
+                if let tmp = String(data: data, encoding: .utf8), !tmp.isEmpty {
+                    formattedJSON = tmp
+                }
             }
             
             if (formattedJSON == nil) {
