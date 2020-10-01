@@ -13,7 +13,7 @@ class APITestAuthenticateRequest: APIRequest {
 
     convenience init(credential: APIAuthCredential) throws {
         
-        let path = "https://pkl.westeurope.cloudapp.azure.com/iam/auth/realms/device-realm/protocol/openid-connect/token"
+        let path = "iam/auth/realms/device-realm/protocol/openid-connect/token"
         
         let object = ["username": credential.username,
                       "password": credential.password,

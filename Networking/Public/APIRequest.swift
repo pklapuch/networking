@@ -10,17 +10,6 @@ import Foundation
 
 open class APIRequest: NSObject {
     
-    public enum Error: CustomNSError, LocalizedError {
-        
-        case invalidPath
-        
-        public var errorDescription: String? {
-            switch self {
-            case .invalidPath: return "invalid path"
-            }
-        }
-    }
-    
     struct Configuration {
         
         static let defaultCachePolicy = URLRequest.CachePolicy.reloadIgnoringCacheData
@@ -28,7 +17,8 @@ open class APIRequest: NSObject {
     }
     
     public let identifier: String
-    public let url: URL
+    public let path: String
+    
     let method: HTTPMethod
     let payload: APIPayload?
     let urlParameters: [String: String]
@@ -36,66 +26,46 @@ open class APIRequest: NSObject {
     let policy: URLRequest.CachePolicy
     let timeout: Int
     let authentication: APIRequestAuthentication
+    let resolver: APIEndpointResolver?
     var modelParser: APIModelParsing?
     var errorParser: APIModelParsing?
     
-    public convenience init(path: String,
-                     method: HTTPMethod,
-                     payload: APIPayload?,
-                     headers: APIHTTPHeaders,
-                     urlParameters: [String: String]? = nil,
-                     modelParser: APIModelParsing? = nil,
-                     errorParser: APIModelParsing? = nil,
-                     authentication: APIRequestAuthentication? = nil,
-                     policy: URLRequest.CachePolicy? = nil,
-                     timeout: Int? = nil) throws {
-        
-        guard let url = URL(string: path) else { throw Error.invalidPath }
-        self.init(url: url,
-                  method: method,
-                  payload: payload,
-                  headers: headers,
-                  urlParameters: urlParameters,
-                  modelParser: modelParser,
-                  errorParser: errorParser,
-                  authentication: authentication,
-                  policy: policy,
-                  timeout: timeout)
-    }
-    
-    public init(url: URL,
+    public init(path: String,
          method: HTTPMethod,
-         payload: APIPayload?,
-         headers: APIHTTPHeaders,
+         payload: APIPayload? = nil,
+         headers: APIHTTPHeaders? = nil,
          urlParameters: [String: String]? = nil,
          modelParser: APIModelParsing? = nil,
          errorParser: APIModelParsing? = nil,
          authentication: APIRequestAuthentication? = nil,
+         resolver: APIEndpointResolver? = nil,
          policy: URLRequest.CachePolicy? = nil,
          timeout: Int? = nil) {
         
         self.identifier = UUID().uuidString
-        self.url = url
+        self.path = path
         self.method = method
         self.payload = payload
-        self.headers = headers
+        self.headers = headers ?? APIHTTPHeaders()
         self.urlParameters = urlParameters ?? [String: String]()
         self.modelParser = modelParser
         self.errorParser = errorParser
         self.authentication = authentication ?? APIRequestAuthentication.oauth
+        self.resolver = resolver
         self.policy = policy ?? Configuration.defaultCachePolicy
         self.timeout = timeout ?? Configuration.defaultTimeoutSeconds
     }
     
     func copyWithNewIdentifier() -> APIRequest {
         
-        return APIRequest(url: url,
+        return APIRequest(path: path,
                           method: method,
                           payload: payload,
                           headers: headers,
                           modelParser: modelParser,
                           errorParser: errorParser,
                           authentication: authentication,
+                          resolver: resolver,
                           policy: policy,
                           timeout: timeout)
     }

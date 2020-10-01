@@ -44,6 +44,7 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
     
     private let authenticating: APIAuthenticating?
     private let pinning: APISessionPinner?
+    private let resolver: APIEndpointResolver?
     
     private var refreshTokenPending = false
     
@@ -58,10 +59,12 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
     
     public init(configuration: URLSessionConfiguration,
                 authenticating: APIAuthenticating? = nil,
-                pinning: APISessionPinning? = nil) {
+                pinning: APISessionPinning? = nil,
+                resolver: APIEndpointResolver? = nil) {
         
         self.authenticating = authenticating
         self.pinning = APISessionPinner.create(pinning: pinning)
+        self.resolver = resolver
         super.init()
         self.urlSession = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
     }
@@ -116,7 +119,8 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
         queue.async { [weak self] in
             guard let self = self else { return }
             do {
-                let urlRequest = try queuedRequest.request.urlRequest(with: sessionHeaders)
+                let url = try self.buildURL(for: queuedRequest.request)
+                let urlRequest = try queuedRequest.request.urlRequest(with: url, sessionHeaders: sessionHeaders)
                 self.request(queuedRequest, didPrepareSessionTask: self.urlSession.createTask(with: urlRequest))
             } catch {
                 self.request(queuedRequest, didFailWithError: error)
@@ -336,19 +340,32 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
         }
     }
     
+    private func buildURL(for request: APIRequest) throws -> URL {
+        
+        if let requestResolver = request.resolver {
+            return try requestResolver.resolve(relativePath: request.path)
+        } else if let sessionResolver = resolver {
+            return try sessionResolver.resolve(relativePath: request.path)
+        } else {
+            return try URL.create(from: request.path)
+        }
+    }
+    
     private func logOutgoing(request: APIRequest, sessionTask: APISessionTask) {
         
-        APINetworking.log?.apiLog(message: "OUT: \(request.url.absoluteString) (\(request.method.rawValue))", type: .info)
+        let url = try? buildURL(for: request)
+        APINetworking.log?.apiLog(message: "OUT: \(url?.absoluteString ?? request.path) (\(request.method.rawValue))", type: .info)
         APINetworking.log?.apiLog(message: "OUT headers: \( sessionTask.urlRequest.getHeadersDescription())", type: .info)
         APINetworking.log?.apiLog(message: "OUT payload: \(sessionTask.getPayloadDescription())", type: .info)
     }
     
     private func logIncoming(request: APIRequest, data: Data?, urlResponse: URLResponse?) {
         
+        let url = try? buildURL(for: request)
         let httpUrlResponse = urlResponse as? HTTPURLResponse
         let code = httpUrlResponse?.statusCode
                 
-        APINetworking.log?.apiLog(message: "IN: \(request.url.absoluteString) (\(request.method.rawValue)) - \(code ?? -1)", type: .info)
+        APINetworking.log?.apiLog(message: "IN: \(url?.absoluteString ?? request.path) (\(request.method.rawValue)) - \(code ?? -1)", type: .info)
         APINetworking.log?.apiLog(message: "IN headers: \( urlResponse?.getHeadersDescription() ?? "--")", type: .info)
         APINetworking.log?.apiLog(message: "IN payload: \(getPayloadDescription(payload: data))", type: .info)
     }

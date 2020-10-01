@@ -10,11 +10,11 @@ import Foundation
 
 extension APIRequest {
     
-    func urlRequest(with sessionHeaders: APIHTTPHeaders? = nil) throws -> URLRequest {
+    func urlRequest(with url: URL, sessionHeaders: APIHTTPHeaders? = nil) throws -> URLRequest {
      
         var request = URLRequest(url: url,
-                                    cachePolicy: policy,
-                                    timeoutInterval: TimeInterval(timeout))
+                                 cachePolicy: policy,
+                                 timeoutInterval: TimeInterval(timeout))
         
         request.httpMethod = method.rawValue
         sessionHeaders?.forEach { request.setValue($0.value, forHTTPHeaderField: $0.name) }

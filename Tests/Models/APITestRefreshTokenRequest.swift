@@ -13,7 +13,7 @@ class APITestRefreshTokenRequest: APIRequest {
 
     convenience init(token: APISessionTokenProtocol) throws {
         
-        let path = "https://pkl.westeurope.cloudapp.azure.com/iam/auth/realms/device-realm/protocol/openid-connect/token"
+        let path = "iam/auth/realms/device-realm/protocol/openid-connect/token"
         
         let object = ["refresh_token": token.getRefreshToken(),
                       "grant_type": "refresh_token",

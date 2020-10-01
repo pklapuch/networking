@@ -52,6 +52,9 @@
 		35A354C224FDAF91004E0D65 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 35A354C124FDAF91004E0D65 /* Assets.xcassets */; };
 		35A354C524FDAF91004E0D65 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 35A354C324FDAF91004E0D65 /* LaunchScreen.storyboard */; };
 		35A354DA24FDAFC8004E0D65 /* libNetworking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3561617F24F8001B00853505 /* libNetworking.a */; };
+		35C714A225262DA800450635 /* APIEndpointResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C714A125262DA800450635 /* APIEndpointResolver.swift */; };
+		35C714AD25263E2500450635 /* URL+String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C714AC25263E2500450635 /* URL+String.swift */; };
+		35C714AF25263E5300450635 /* URLError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C714AE25263E5300450635 /* URLError.swift */; };
 		35E0FC5A24FC2072008D2935 /* APIAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35E0FC5924FC2072008D2935 /* APIAuthManager.swift */; };
 		35E0FC5C24FC20A7008D2935 /* APIAuthCredential.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35E0FC5B24FC20A7008D2935 /* APIAuthCredential.swift */; };
 		35E0FC6024FC2224008D2935 /* APICredentialStoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35E0FC5F24FC2224008D2935 /* APICredentialStoreProtocol.swift */; };
@@ -165,6 +168,9 @@
 		35A354C124FDAF91004E0D65 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		35A354C424FDAF91004E0D65 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		35A354C624FDAF91004E0D65 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		35C714A125262DA800450635 /* APIEndpointResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIEndpointResolver.swift; sourceTree = "<group>"; };
+		35C714AC25263E2500450635 /* URL+String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+String.swift"; sourceTree = "<group>"; };
+		35C714AE25263E5300450635 /* URLError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLError.swift; sourceTree = "<group>"; };
 		35E0FC5924FC2072008D2935 /* APIAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIAuthManager.swift; sourceTree = "<group>"; };
 		35E0FC5B24FC20A7008D2935 /* APIAuthCredential.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIAuthCredential.swift; sourceTree = "<group>"; };
 		35E0FC5F24FC2224008D2935 /* APICredentialStoreProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APICredentialStoreProtocol.swift; sourceTree = "<group>"; };
@@ -222,6 +228,7 @@
 				356161BD24F9921700853505 /* APIPayload+Serializer.swift */,
 				3536142324FC1DC800399906 /* APISession+InternalError.swift */,
 				35887D66252556AE0015E04F /* Data+String.swift */,
+				35C714AC25263E2500450635 /* URL+String.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -245,6 +252,7 @@
 				3557E83324FAE2500037ED43 /* APITokenActionProtocol.swift */,
 				35E0FC5F24FC2224008D2935 /* APICredentialStoreProtocol.swift */,
 				35E0FC7F24FC3472008D2935 /* APISessionProtocol.swift */,
+				35C714A125262DA800450635 /* APIEndpointResolver.swift */,
 			);
 			path = Protocol;
 			sourceTree = "<group>";
@@ -342,6 +350,7 @@
 				356161A824F8071D00853505 /* APIRawResponse.swift */,
 				357C8D8124FBF2BD001D012C /* APISessionTask.swift */,
 				35887D6B252556DE0015E04F /* DataError.swift */,
+				35C714AE25263E5300450635 /* URLError.swift */,
 			);
 			path = Private;
 			sourceTree = "<group>";
@@ -544,6 +553,7 @@
 				356161A524F804A300853505 /* APIPayload.swift in Sources */,
 				356161A124F8037E00853505 /* HTTPMethod.swift in Sources */,
 				3557E83124FAE0490037ED43 /* APILogging.swift in Sources */,
+				35C714AD25263E2500450635 /* URL+String.swift in Sources */,
 				3557E83E24FB03700037ED43 /* APICallback.swift in Sources */,
 				3561618C24F8005F00853505 /* APISession.swift in Sources */,
 				357C8D8024FB18D0001D012C /* APIQueuedRequest.swift in Sources */,
@@ -556,9 +566,11 @@
 				35E0FC6024FC2224008D2935 /* APICredentialStoreProtocol.swift in Sources */,
 				356161C624F9B2FA00853505 /* Data+Hex.swift in Sources */,
 				35E0FCE624FC43C4008D2935 /* APIHTTPHeader.swift in Sources */,
+				35C714AF25263E5300450635 /* URLError.swift in Sources */,
 				35E0FCE824FC43E5008D2935 /* APIHTTPHeaders.swift in Sources */,
 				3561618324F8001B00853505 /* APINetworking.swift in Sources */,
 				357C8D8224FBF2BD001D012C /* APISessionTask.swift in Sources */,
+				35C714A225262DA800450635 /* APIEndpointResolver.swift in Sources */,
 				356161AD24F807F500853505 /* APIActiveRequest.swift in Sources */,
 				3557E82D24FADD8B0037ED43 /* APISessionTokenProtocol.swift in Sources */,
 				3557E83624FAE3750037ED43 /* APIRequestAuthentication.swift in Sources */,
