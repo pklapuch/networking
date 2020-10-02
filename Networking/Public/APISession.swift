@@ -305,41 +305,6 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
         }
     }
     
-    /** LOG -  IN */
-    private func getPayloadDescription(payload: Data?) -> String {
-        
-        var formattedJSON: String?
-        var bytes: Int = 0
-        
-        if let data = payload {
-            
-            bytes = data.count
-            if let json = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) {
-                if let prettyData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
-                    formattedJSON = String(data: prettyData, encoding: .utf8)
-                }
-            }
-            
-            if (formattedJSON == nil) {
-                if let tmp = String(data: data, encoding: .utf8), !tmp.isEmpty {
-                    formattedJSON = tmp
-                }
-            }
-            
-            if (formattedJSON == nil) {
-                formattedJSON = data.hexString
-            }
-        }
-        
-        if let formattedJSON = formattedJSON {
-            var output = "\(formattedJSON.prefix(400))"
-            if formattedJSON.count > 400 { output.append("... (total bytes: \(bytes))") }
-            return output
-        } else {
-            return "--"
-        }
-    }
-    
     private func buildURL(for request: APIRequest) throws -> URL {
         
         if let requestResolver = request.resolver {
@@ -349,25 +314,6 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
         } else {
             return try URL.create(from: request.path)
         }
-    }
-    
-    private func logOutgoing(request: APIRequest, sessionTask: APISessionTask) {
-        
-        let url = try? buildURL(for: request)
-        APINetworking.log?.apiLog(message: "OUT: \(url?.absoluteString ?? request.path) (\(request.method.rawValue))", type: .info)
-        APINetworking.log?.apiLog(message: "OUT headers: \( sessionTask.urlRequest.getHeadersDescription())", type: .info)
-        APINetworking.log?.apiLog(message: "OUT payload: \(sessionTask.getPayloadDescription())", type: .info)
-    }
-    
-    private func logIncoming(request: APIRequest, data: Data?, urlResponse: URLResponse?) {
-        
-        let url = try? buildURL(for: request)
-        let httpUrlResponse = urlResponse as? HTTPURLResponse
-        let code = httpUrlResponse?.statusCode
-                
-        APINetworking.log?.apiLog(message: "IN: \(url?.absoluteString ?? request.path) (\(request.method.rawValue)) - \(code ?? -1)", type: .info)
-        APINetworking.log?.apiLog(message: "IN headers: \( urlResponse?.getHeadersDescription() ?? "--")", type: .info)
-        APINetworking.log?.apiLog(message: "IN payload: \(getPayloadDescription(payload: data))", type: .info)
     }
     
     private func forget(request: APIRequest) {
@@ -444,5 +390,76 @@ extension URLSession {
     
     fileprivate func createTask(with urlRequest: URLRequest) -> APISessionTask {
         return APISessionTask(request: urlRequest, session: self)
+    }
+}
+
+extension APISession {
+    
+    // MRAK: Logging
+    
+    private func logOutgoing(request: APIRequest, sessionTask: APISessionTask) {
+        
+        logOutgoingURL(for: request, urlRequest: sessionTask.urlRequest)
+        logOutgoingHeaders(for: request, urlRequest: sessionTask.urlRequest)
+        logOutgoingPayload(for: request, urlRequest: sessionTask.urlRequest)
+    }
+    
+    private func logOutgoingURL(for request: APIRequest, urlRequest: URLRequest) {
+        
+        // NOTE: If needed, add URL obfuscation for log message when initializing APIRequest!
+        
+        APINetworking.log?.apiLog(message: "OUT: \(urlRequest.url?.absoluteString ?? request.path) (\(request.method.rawValue))", type: .info)
+    }
+    
+    private func logOutgoingHeaders(for request: APIRequest, urlRequest: URLRequest) {
+        
+        // NOTE: If needed, add Headers obfuscation for log message when initializing APIRequest!
+        
+        APINetworking.log?.apiLog(message: "OUT headers: \( urlRequest.getHeadersDescription())", type: .info)
+    }
+    
+    private func logOutgoingPayload(for request: APIRequest, urlRequest: URLRequest) {
+        
+        // NOTE: If needed, add Payload obfuscation for log message when initializing APIRequest!
+        
+        var desc: String?
+        if let logger = request.outgoingLogger?.payload {
+            desc = logger.getPayloadDescription(for: urlRequest.httpBody)
+        } else {
+            desc = PayloadUtility.getLogDescription(for: urlRequest.httpBody)
+        }
+
+        APINetworking.log?.apiLog(message: "OUT payload: \(desc ?? "--")", type: .info)
+    }
+    
+    private func logIncoming(request: APIRequest, data: Data?, urlResponse: URLResponse?) {
+        
+        logIncomingURL(for: request, urlResponse: urlResponse)
+        logIncomingHeaders(for: request, urlResponse: urlResponse)
+        logIncomingPayload(for: request, data: data)
+    }
+    
+    private func logIncomingURL(for request: APIRequest, urlResponse: URLResponse?) {
+        
+        // NOTE: If needed, add URL obfuscation for log message when initializing APIRequest!
+        
+        let httpUrlResponse = urlResponse as? HTTPURLResponse
+        let code = httpUrlResponse?.statusCode
+        
+        APINetworking.log?.apiLog(message: "IN: \(urlResponse?.url?.absoluteString ?? request.path) (\(request.method.rawValue)) - \(code ?? -1)", type: .info)
+    }
+    
+    private func logIncomingHeaders(for request: APIRequest, urlResponse: URLResponse?) {
+        
+        // NOTE: If needed, add Headers obfuscation for log message when initializing APIRequest!
+        
+        APINetworking.log?.apiLog(message: "IN headers: \( urlResponse?.getHeadersDescription() ?? "--")", type: .info)
+    }
+    
+    private func logIncomingPayload(for request: APIRequest, data: Data?) {
+        
+        // NOTE: If needed, add Payload obfuscation for log message when initializing APIRequest!
+        
+        APINetworking.log?.apiLog(message: "IN payload: \(PayloadUtility.getLogDescription(for: data) ?? "--")", type: .info)
     }
 }

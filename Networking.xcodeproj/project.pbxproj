@@ -18,6 +18,8 @@
 		3557E83424FAE2500037ED43 /* APITokenActionProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3557E83324FAE2500037ED43 /* APITokenActionProtocol.swift */; };
 		3557E83624FAE3750037ED43 /* APIRequestAuthentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3557E83524FAE3750037ED43 /* APIRequestAuthentication.swift */; };
 		3557E83E24FB03700037ED43 /* APICallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3557E83D24FB036F0037ED43 /* APICallback.swift */; };
+		3560B686252775DD005BD577 /* APIPayloadLogging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3560B685252775DD005BD577 /* APIPayloadLogging.swift */; };
+		3560B68B25277666005BD577 /* PayloadUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3560B68A25277666005BD577 /* PayloadUtility.swift */; };
 		3561618324F8001B00853505 /* APINetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3561618224F8001B00853505 /* APINetworking.swift */; };
 		3561618C24F8005F00853505 /* APISession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3561618B24F8005F00853505 /* APISession.swift */; };
 		3561619424F800E800853505 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3561619324F800E800853505 /* Tests.swift */; };
@@ -131,6 +133,8 @@
 		3557E83324FAE2500037ED43 /* APITokenActionProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APITokenActionProtocol.swift; sourceTree = "<group>"; };
 		3557E83524FAE3750037ED43 /* APIRequestAuthentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIRequestAuthentication.swift; sourceTree = "<group>"; };
 		3557E83D24FB036F0037ED43 /* APICallback.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APICallback.swift; sourceTree = "<group>"; };
+		3560B685252775DD005BD577 /* APIPayloadLogging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIPayloadLogging.swift; sourceTree = "<group>"; };
+		3560B68A25277666005BD577 /* PayloadUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayloadUtility.swift; sourceTree = "<group>"; };
 		3561617F24F8001B00853505 /* libNetworking.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libNetworking.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3561618224F8001B00853505 /* APINetworking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APINetworking.swift; sourceTree = "<group>"; };
 		3561618B24F8005F00853505 /* APISession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APISession.swift; sourceTree = "<group>"; };
@@ -333,6 +337,7 @@
 				35887D5A2525565D0015E04F /* APIContentDisposition.swift */,
 				35887D592525565D0015E04F /* APIMultipartContainer.swift */,
 				35E0FCE724FC43E5008D2935 /* APIHTTPHeaders.swift */,
+				3560B685252775DD005BD577 /* APIPayloadLogging.swift */,
 			);
 			path = Public;
 			sourceTree = "<group>";
@@ -351,6 +356,7 @@
 				357C8D8124FBF2BD001D012C /* APISessionTask.swift */,
 				35887D6B252556DE0015E04F /* DataError.swift */,
 				35C714AE25263E5300450635 /* URLError.swift */,
+				3560B68A25277666005BD577 /* PayloadUtility.swift */,
 			);
 			path = Private;
 			sourceTree = "<group>";
@@ -562,6 +568,7 @@
 				356161C224F9A80300853505 /* APISessionPinning.swift in Sources */,
 				356161B024F80B8300853505 /* APIModelParsing.swift in Sources */,
 				3536142124FBFB2300399906 /* Error+NSError.swift in Sources */,
+				3560B686252775DD005BD577 /* APIPayloadLogging.swift in Sources */,
 				3557E82824FAD9450037ED43 /* APIAuthenticating.swift in Sources */,
 				35E0FC6024FC2224008D2935 /* APICredentialStoreProtocol.swift in Sources */,
 				356161C624F9B2FA00853505 /* Data+Hex.swift in Sources */,
@@ -585,6 +592,7 @@
 				35887D6C252556DE0015E04F /* DataError.swift in Sources */,
 				35887D5C2525565D0015E04F /* APIContentDisposition.swift in Sources */,
 				3557E83424FAE2500037ED43 /* APITokenActionProtocol.swift in Sources */,
+				3560B68B25277666005BD577 /* PayloadUtility.swift in Sources */,
 				356161BE24F9921700853505 /* APIPayload+Serializer.swift in Sources */,
 				35887D5B2525565D0015E04F /* APIMultipartContainer.swift in Sources */,
 				3557E82324FAB61A0037ED43 /* APISessionPinner.swift in Sources */,

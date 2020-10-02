@@ -27,8 +27,12 @@ open class APIRequest: NSObject {
     let timeout: Int
     let authentication: APIRequestAuthentication
     let resolver: APIEndpointResolver?
+    
     var modelParser: APIModelParsing?
     var errorParser: APIModelParsing?
+    
+    var outgoingLogger: APIRequestLogging?
+    var incomingLogger: APIRequestLogging?
     
     public init(path: String,
          method: HTTPMethod,
@@ -40,6 +44,8 @@ open class APIRequest: NSObject {
          authentication: APIRequestAuthentication? = nil,
          resolver: APIEndpointResolver? = nil,
          policy: URLRequest.CachePolicy? = nil,
+         outgoingLogger: APIRequestLogging? = nil,
+         incomingLogger: APIRequestLogging? = nil,
          timeout: Int? = nil) {
         
         self.identifier = UUID().uuidString
@@ -53,6 +59,8 @@ open class APIRequest: NSObject {
         self.authentication = authentication ?? APIRequestAuthentication.oauth
         self.resolver = resolver
         self.policy = policy ?? Configuration.defaultCachePolicy
+        self.outgoingLogger = outgoingLogger
+        self.incomingLogger = incomingLogger
         self.timeout = timeout ?? Configuration.defaultTimeoutSeconds
     }
     
@@ -67,6 +75,8 @@ open class APIRequest: NSObject {
                           authentication: authentication,
                           resolver: resolver,
                           policy: policy,
+                          outgoingLogger: outgoingLogger,
+                          incomingLogger: incomingLogger,
                           timeout: timeout)
     }
 }
