@@ -42,11 +42,14 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
     private let queue = DispatchQueue(label: "com.pk.networking.session")
     private var urlSession: URLSession!
     
-    private let authenticating: APIAuthenticating?
+    private let signing: APISigning?
     private let pinning: APISessionPinner?
     private let resolver: APIEndpointResolver?
     
-    private var refreshTokenPending = false
+    // Session specific headers
+    private var headers: APIHTTPHeaders? = nil
+    
+    private var signatureRenewalPending = false
     
     /** Requests not currently executing and waiting to be executed */
     private var queuedRequests = [APIQueuedRequest]()
@@ -54,15 +57,12 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
     /** Requests currently being executed or cancelled */
     private var activeRequests = [APIActiveRequest]()
     
-    /** Requests waiting for refresh token completion */
-    private var authQueuedRequests = [APIQueuedRequest]()
-    
     public init(configuration: URLSessionConfiguration,
-                authenticating: APIAuthenticating? = nil,
+                signing: APISigning? = nil,
                 pinning: APISessionPinning? = nil,
                 resolver: APIEndpointResolver? = nil) {
         
-        self.authenticating = authenticating
+        self.signing = signing
         self.pinning = APISessionPinner.create(pinning: pinning)
         self.resolver = resolver
         super.init()
@@ -82,6 +82,17 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
         }
     }
     
+    public func getURL(for request: APIRequest) throws -> URL {
+        
+        if let requestResolver = request.resolver {
+            return try requestResolver.resolve(relativePath: request.path)
+        } else if let sessionResolver = resolver {
+            return try sessionResolver.resolve(relativePath: request.path)
+        } else {
+            return try URL.create(from: request.path)
+        }
+    }
+    
     /** ATM will attempt to cancel request - if request already completed -> will take no further action */
     public func cancel(request: APIRequest) {
        
@@ -91,40 +102,53 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
     }
     
     private func resumeAllQueuedRequests() {
+                
+        guard signatureRenewalPending == false else { return }
         
-        // Trigger all non-auth requests
-        let nonAuthRequests = queuedRequests.filter { $0.request.authentication == .none }
-        nonAuthRequests.forEach { resume(queuedRequest: $0 )}
+        let requests = queuedRequests
+        queuedRequests.removeAll()
         
-        // Trigger all auth requests or wait for refresh token to complete
-        guard refreshTokenPending == false else { return }
-        let authRequests = queuedRequests.filter { $0.request.authentication == .oauth }
-        authRequests.forEach { resume(queuedRequest: $0) }
+        requests.forEach { resume(queuedRequest: $0) }
     }
     
     private func resume(queuedRequest: APIQueuedRequest) {
         
-        queuedRequests.removeAll(where: { $0.ID == queuedRequest.ID })
-        let request = queuedRequest.request
+        do {
         
-        createSessionHeaders(for: request, onSuccess: { [weak self] sessionHeaders in
-            self?.request(queuedRequest, didPrepareSessionHeaders: sessionHeaders)
-        }) { [weak self] error in
-            self?.request(queuedRequest, didFailWithError: error)
+            let url = try self.getURL(for: queuedRequest.request)
+            let urlRequest = try queuedRequest.request.urlRequest(with: url, sessionHeaders: headers)
+            sign(urlRequset: urlRequest, queuedRequest: queuedRequest)
+           
+        } catch {
+            self.request(queuedRequest, didFailWithError: error)
         }
     }
     
-    private func request(_ queuedRequest: APIQueuedRequest, didPrepareSessionHeaders sessionHeaders: APIHTTPHeaders) {
+    private func sign(urlRequset: URLRequest, queuedRequest: APIQueuedRequest) {
         
-        queue.async { [weak self] in
-            guard let self = self else { return }
-            do {
-                let url = try self.buildURL(for: queuedRequest.request)
-                let urlRequest = try queuedRequest.request.urlRequest(with: url, sessionHeaders: sessionHeaders)
-                self.request(queuedRequest, didPrepareSessionTask: self.urlSession.createTask(with: urlRequest))
-            } catch {
-                self.request(queuedRequest, didFailWithError: error)
+        if let signing = signing {
+            
+            signing.sign(urlRequset) { [weak self] signedRequset in
+                
+                guard let self = self else { return }
+                self.queue.async {
+                
+                    let task = self.urlSession.createTask(with: signedRequset)
+                    self.request(queuedRequest, didPrepareSessionTask: task)
+                }
+                
+            } onFailure: { [weak self] error in
+                
+                guard let self = self else { return }
+                self.queue.async {
+                    self.request(queuedRequest, didFailWithError: error)
+                }
             }
+
+        } else {
+            
+            let task = urlSession.createTask(with: urlRequset)
+            self.request(queuedRequest, didPrepareSessionTask: task)
         }
     }
     
@@ -135,7 +159,7 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
             let activeRequest = APIActiveRequest.create(fromQueuedRequest: queuedRequest, sessionTask: task)
             self.activeRequests.append(activeRequest)
             self.logOutgoing(request: queuedRequest.request, sessionTask: task)
-            
+
             task.resume(onSuccess: { [weak self] data, urlResponse in
                 self?.request(queuedRequest, didGetURLResponse: urlResponse, andData: data)
             }) { [weak self] error in
@@ -155,11 +179,11 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
     
     private func request(_ queuedRequest: APIQueuedRequest, didGetRawResopsne rawResponse: APIRawResponse) {
         
-        guard rawResponse.status != 401 else {
-            
-            let error: Swift.Error = queuedRequest.request.authentication == .none ? Error.unauthorized : InternalError.tokenExpired
-            request(queuedRequest, didFailWithError: error)
-            return
+        if let signing = signing {
+            if signing.isSignatureRejected(rawResponse.data, status: rawResponse.status) {
+                request(queuedRequest, didFailWithError: InternalError.signatureExpired)
+                return
+            }
         }
         
         let httpGroupCode = APIHTTPGroupCode.create(from: rawResponse.status)
@@ -201,9 +225,9 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
         
         forget(request: queuedRequest.request)
         
-        if error.isError(.tokenExpired) {
-            addAuthQueuedRequest(queuedRequest)
-            refreshToken()
+        if error.isError(.signatureExpired) {
+            addQueuedRequest(queuedRequest)
+            requestSignatureRenewal()
         } else {
             queuedRequest.callback.onError(error)
         }
@@ -244,25 +268,25 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
         
         guard queuedRequests.first(where: { $0.ID == request.identifier }) == nil else { return false }
         guard activeRequests.first(where: { $0.ID == request.identifier }) == nil else { return false }
-        guard authQueuedRequests.first(where: { $0.ID == request.identifier }) == nil else { return false }
         
         return true
     }
 
-    private func refreshToken() {
+    private func requestSignatureRenewal() {
         
-        APINetworking.log?.apiLog(message: "refresh token", type: .info)
-        refreshTokenPending = true
+        APINetworking.log?.apiLog(message: "refresh grant", type: .info)
+        signatureRenewalPending = true
         
-        if let auth = authenticating {
+        if let signing = signing {
             
-            auth.refresh(onSuccess: { [weak self] _ in
+            signing.renewSignature { [weak self] in
                 self?.refreshTokenDidComplete(with: nil)
-            }) { [weak self] error in
+            } onFailure: { [weak self] error in
                 self?.refreshTokenDidComplete(with: error)
             }
 
         } else {
+            
             refreshTokenDidComplete(with: Error.unauthorized)
         }
     }
@@ -272,76 +296,37 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
         queue.async { [weak self] in
             guard let self = self else { return }
         
-            self.refreshTokenPending = false
+            self.signatureRenewalPending = false
             
             if let error = error {
                 APINetworking.log?.apiLog(message: "failed to refresh token (\(error)", type: .error)
-                self.authQueuedRequests.forEach { $0.callback.onError(Error.cancelled) }
+                self.queuedRequests.forEach { $0.callback.onError(Error.cancelled) }
                 self.onAuthenitcationRequired?(error)
                 
             } else {
                 APINetworking.log?.apiLog(message: "did refresh token", type: .info)
-                self.queuedRequests.append(contentsOf: self.authQueuedRequests)
             }
             
             self.resumeAllQueuedRequests()
-            self.authQueuedRequests.removeAll()
-        }
-    }
-    
-    private func createSessionHeaders(for request: APIRequest,
-                                      onSuccess:@escaping HeadersBlock,
-                                      onError:@escaping ErrorBlock) {
-        
-        switch request.authentication {
-            
-            case .none: onSuccess(APIHTTPHeaders())
-            case .oauth:
-            
-                guard let auth = authenticating else { onError(Error.unauthorized); return }
-                auth.getCurrentToken(onSuccess: { token in
-                    onSuccess(APIHTTPHeaders(["authorization": "Bearer \(token.getAccessToken())"]))
-                }, onError: onError)
-        }
-    }
-    
-    private func buildURL(for request: APIRequest) throws -> URL {
-        
-        if let requestResolver = request.resolver {
-            return try requestResolver.resolve(relativePath: request.path)
-        } else if let sessionResolver = resolver {
-            return try sessionResolver.resolve(relativePath: request.path)
-        } else {
-            return try URL.create(from: request.path)
         }
     }
     
     private func forget(request: APIRequest) {
         
         if let index = queuedRequests.firstIndex(where: { $0.ID == request.identifier }) {
-            print("delete request from queued_inactive (\(request.identifier)")
+            //print("delete request from queued_inactive (\(request.identifier)")
             queuedRequests.remove(at: index)
         }
 
         if let index = activeRequests.firstIndex(where: { $0.ID == request.identifier }) {
-            print("delete request from active (\(request.identifier)")
+            //print("delete request from active (\(request.identifier)")
             activeRequests.remove(at: index)
-        }
-        
-        if let index = authQueuedRequests.firstIndex(where: { $0.ID == request.identifier }) {
-            print("delete request from queued_auth (\(request.identifier)")
-            authQueuedRequests.remove(at: index)
         }
     }
     
     private func addQueuedRequest(_ queuedRequest: APIQueuedRequest) {
         
         self.queuedRequests.append(queuedRequest)
-    }
-    
-    private func addAuthQueuedRequest(_ queuedRequest: APIQueuedRequest) {
-        
-        self.authQueuedRequests.append(queuedRequest)
     }
 }
 

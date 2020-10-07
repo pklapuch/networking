@@ -12,8 +12,7 @@ public typealias ResponseBlock = (APIResponse) -> Void
 public typealias VoidBlock = () -> Void
 public typealias OptionalErrorBlock = (Swift.Error?) -> Void
 public typealias HeadersBlock = (APIHTTPHeaders) -> Void
-public typealias TokenBlock = (APISessionTokenProtocol) -> Void
-public typealias OptionalTokenBlock = (APISessionTokenProtocol?) -> Void
+public typealias SignBlock = (URLRequest) -> Void
 public typealias ErrorBlock = (Swift.Error) -> Void
 
 typealias URLResponseBlock = ((Data?, URLResponse?)) -> Void

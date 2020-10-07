@@ -15,9 +15,10 @@ extension APISession {
         static var errorDomain: String { "APISession.InternalError" }
         var errorCode: Int {
             switch self {
-            case .tokenExpired: return 1
+            case .signatureExpired: return 1
             }
         }
-        case tokenExpired
+        
+        case signatureExpired
     }
 }

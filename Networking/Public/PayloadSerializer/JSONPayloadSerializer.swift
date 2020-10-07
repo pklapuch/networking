@@ -8,9 +8,13 @@
 
 import Foundation
 
-struct JSONPayloadSerializer {
+public struct JSONPayloadSerializer {
 
-    func encode(object: Any) throws -> Data {
+    public init() {
+        
+    }
+    
+    public func encode(object: Any) throws -> Data {
         
         return try JSONSerialization.data(withJSONObject: object, options: .fragmentsAllowed)
     }

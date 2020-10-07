@@ -25,7 +25,6 @@ open class APIRequest: NSObject {
     let headers: APIHTTPHeaders
     let policy: URLRequest.CachePolicy
     let timeout: Int
-    let authentication: APIRequestAuthentication
     let resolver: APIEndpointResolver?
     
     var modelParser: APIModelParsing?
@@ -41,7 +40,6 @@ open class APIRequest: NSObject {
          urlParameters: [String: String]? = nil,
          modelParser: APIModelParsing? = nil,
          errorParser: APIModelParsing? = nil,
-         authentication: APIRequestAuthentication? = nil,
          resolver: APIEndpointResolver? = nil,
          policy: URLRequest.CachePolicy? = nil,
          outgoingLogger: APIRequestLogging? = nil,
@@ -56,7 +54,6 @@ open class APIRequest: NSObject {
         self.urlParameters = urlParameters ?? [String: String]()
         self.modelParser = modelParser
         self.errorParser = errorParser
-        self.authentication = authentication ?? APIRequestAuthentication.oauth
         self.resolver = resolver
         self.policy = policy ?? Configuration.defaultCachePolicy
         self.outgoingLogger = outgoingLogger
@@ -72,7 +69,6 @@ open class APIRequest: NSObject {
                           headers: headers,
                           modelParser: modelParser,
                           errorParser: errorParser,
-                          authentication: authentication,
                           resolver: resolver,
                           policy: policy,
                           outgoingLogger: outgoingLogger,

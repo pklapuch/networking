@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct HTTPQuerySerializer {
+public struct HTTPQuerySerializer {
 
     enum Error: CustomNSError, LocalizedError {
         
@@ -20,7 +20,11 @@ struct HTTPQuerySerializer {
         }
     }
     
-    func encode(object: Any) throws -> Data {
+    public init() {
+        
+    }
+    
+    public func encode(object: Any) throws -> Data {
         
         guard let dictionary = object as? [String: String] else { throw Error.invalidFormat }
         
@@ -40,6 +44,23 @@ struct HTTPQuerySerializer {
         } else {
             throw Error.invalidFormat
         }
+    }
+    
+    public func decode(_ data: Data) throws -> [String: Any] {
+        
+        guard let query = String(data: data, encoding: .utf8) else { throw Error.invalidFormat }
+        
+        let keyValues = query.components(separatedBy: "&")
+        var dict = [String: Any]()
+        keyValues.forEach {
+            
+            let components = $0.components(separatedBy: "=")
+            if components.count == 2 {
+                dict[components[0]] = components[1]
+            }
+        }
+        
+        return dict
     }
 }
 
