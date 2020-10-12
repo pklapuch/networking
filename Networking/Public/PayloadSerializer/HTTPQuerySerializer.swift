@@ -30,8 +30,7 @@ public struct HTTPQuerySerializer {
         
         let items = try dictionary.map { item -> URLQueryItem in
             
-            let tmpValue = item.value.replacingOccurrences(of: " ", with: "+", options: .caseInsensitive, range: nil)
-            if let value = tmpValue.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
+            if let value = item.value.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
                 return URLQueryItem(name: item.key, value: value)
             } else {
                 throw Error.invalidFormat
