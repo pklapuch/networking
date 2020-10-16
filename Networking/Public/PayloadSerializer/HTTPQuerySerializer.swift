@@ -31,7 +31,13 @@ public struct HTTPQuerySerializer {
         let items = try dictionary.map { item -> URLQueryItem in
             
             if let value = item.value.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
-                return URLQueryItem(name: item.key, value: value)
+                
+                var urlSafeValue = value
+                if urlSafeValue.contains("+") {
+                    urlSafeValue = urlSafeValue.replacingOccurrences(of: "+", with: "%2B")
+                }
+                
+                return URLQueryItem(name: item.key, value: urlSafeValue)
             } else {
                 throw Error.invalidFormat
             }
@@ -51,12 +57,37 @@ public struct HTTPQuerySerializer {
         guard let query = String(data: data, encoding: .utf8) else { throw Error.invalidFormat }
         
         let keyValues = query.components(separatedBy: "&")
+        
         var dict = [String: Any]()
         keyValues.forEach {
             
-            let components = $0.components(separatedBy: "=")
-            if components.count == 2 {
-                dict[components[0]] = components[1]
+            if let separatorIndex = $0.firstIndex(of: "=") {
+                
+                let key = String($0[$0.startIndex..<separatorIndex])
+                
+                let separatorIndexInt = $0.distance(from: $0.startIndex, to: separatorIndex)
+                let valueFirstIndexInt = separatorIndexInt + 1
+                let lastIndexInt = $0.distance(from: $0.startIndex, to: $0.endIndex) 
+                let valueLength = lastIndexInt - valueFirstIndexInt
+                
+                if (valueLength > 0) {
+                
+                    let startIndex = $0.index($0.startIndex, offsetBy: valueFirstIndexInt)
+                    let endIndex = $0.endIndex
+                    
+                    let value = String($0[startIndex..<endIndex])
+                    
+                    var urlUnsafeValue = value
+                    if urlUnsafeValue.contains("%2B") {
+                        urlUnsafeValue = urlUnsafeValue.replacingOccurrences(of: "%2B", with: "+")
+                    }
+                    
+                    dict[key] = urlUnsafeValue
+                    
+                } else {
+                    
+                    dict[key] = ""
+                }
             }
         }
         
