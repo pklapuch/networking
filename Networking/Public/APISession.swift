@@ -15,6 +15,7 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
     public enum Error: CustomNSError, LocalizedError {
         
         case cancelled
+        case invalidURL
         case duplicatedRequest
         case unauthorized
         case backend(String)
@@ -23,15 +24,17 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
         public var errorCode: Int {
             switch self {
             case .cancelled: return 1
-            case .duplicatedRequest: return 2
-            case .unauthorized: return 3
-            case .backend(_): return 4
+            case .invalidURL: return 2
+            case .duplicatedRequest: return 3
+            case .unauthorized: return 4
+            case .backend(_): return 5
             }
         }
         
         public var errorDescription: String? {
             switch self {
             case .cancelled: return "cancelled"
+            case .invalidURL: return "invalid URL"
             case .duplicatedRequest: return "duplicated request"
             case .unauthorized: return "unauthorized"
             case .backend(let message): return "backend: \(message)"
@@ -84,13 +87,22 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
     
     public func getURL(for request: APIRequest) throws -> URL {
         
+        var url: URL?
+        
         if let requestResolver = request.resolver {
-            return try requestResolver.resolve(relativePath: request.path)
+            url = try requestResolver.resolve(relativePath: request.path)
         } else if let sessionResolver = resolver {
-            return try sessionResolver.resolve(relativePath: request.path)
+            url = try sessionResolver.resolve(relativePath: request.path)
         } else {
-            return try URL.create(from: request.path)
+            url = try URL.create(from: request.path)
         }
+        
+        guard var finalURL = url else { throw Error.cancelled }
+        for item in request.urlParameters {
+            try finalURL.appendQueryItem(name: item.key, value: item.value)
+        }
+        
+        return finalURL
     }
     
     /** ATM will attempt to cancel request - if request already completed -> will take no further action */

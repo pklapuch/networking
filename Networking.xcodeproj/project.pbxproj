@@ -37,6 +37,7 @@
 		356161C224F9A80300853505 /* APISessionPinning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356161C124F9A80300853505 /* APISessionPinning.swift */; };
 		356161C424F9AAB100853505 /* AuthTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356161C324F9AAB100853505 /* AuthTests.swift */; };
 		356161C624F9B2FA00853505 /* Data+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356161C524F9B2FA00853505 /* Data+Hex.swift */; };
+		3568F770253E3605009470AE /* URL+Query.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3568F76F253E3605009470AE /* URL+Query.swift */; };
 		357C8D7D24FB1417001D012C /* TestAPILogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 357C8D7C24FB1417001D012C /* TestAPILogger.swift */; };
 		357C8D8024FB18D0001D012C /* APIQueuedRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 357C8D7F24FB18D0001D012C /* APIQueuedRequest.swift */; };
 		357C8D8224FBF2BD001D012C /* APISessionTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 357C8D8124FBF2BD001D012C /* APISessionTask.swift */; };
@@ -136,6 +137,7 @@
 		356161C124F9A80300853505 /* APISessionPinning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APISessionPinning.swift; sourceTree = "<group>"; };
 		356161C324F9AAB100853505 /* AuthTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthTests.swift; sourceTree = "<group>"; };
 		356161C524F9B2FA00853505 /* Data+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Hex.swift"; sourceTree = "<group>"; };
+		3568F76F253E3605009470AE /* URL+Query.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Query.swift"; sourceTree = "<group>"; };
 		357C8D7C24FB1417001D012C /* TestAPILogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestAPILogger.swift; sourceTree = "<group>"; };
 		357C8D7F24FB18D0001D012C /* APIQueuedRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIQueuedRequest.swift; sourceTree = "<group>"; };
 		357C8D8124FBF2BD001D012C /* APISessionTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APISessionTask.swift; sourceTree = "<group>"; };
@@ -203,6 +205,7 @@
 				3536142324FC1DC800399906 /* APISession+InternalError.swift */,
 				35887D66252556AE0015E04F /* Data+String.swift */,
 				35C714AC25263E2500450635 /* URL+String.swift */,
+				3568F76F253E3605009470AE /* URL+Query.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -540,6 +543,7 @@
 				35887D6C252556DE0015E04F /* DataError.swift in Sources */,
 				35887D5C2525565D0015E04F /* APIContentDisposition.swift in Sources */,
 				3560B68B25277666005BD577 /* PayloadUtility.swift in Sources */,
+				3568F770253E3605009470AE /* URL+Query.swift in Sources */,
 				356161BE24F9921700853505 /* APIPayload+Serializer.swift in Sources */,
 				35887D5B2525565D0015E04F /* APIMultipartContainer.swift in Sources */,
 				3557E82324FAB61A0037ED43 /* APISessionPinner.swift in Sources */,
