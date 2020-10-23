@@ -57,20 +57,6 @@
 		35C714AF25263E5300450635 /* URLError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C714AE25263E5300450635 /* URLError.swift */; };
 		35E0FC6224FC2285008D2935 /* APIQueuedSignOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35E0FC6124FC2285008D2935 /* APIQueuedSignOperation.swift */; };
 		35E0FC8024FC3472008D2935 /* APISessionProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35E0FC7F24FC3472008D2935 /* APISessionProtocol.swift */; };
-		35E0FC8224FC3683008D2935 /* APIRequest+Session.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3536141E24FBF71300399906 /* APIRequest+Session.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		35E0FC8324FC3683008D2935 /* Error+NSError.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3536142024FBFB2300399906 /* Error+NSError.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		35E0FC8424FC3683008D2935 /* APISessionPinning.swift in Headers */ = {isa = PBXBuildFile; fileRef = 356161C124F9A80300853505 /* APISessionPinning.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		35E0FC8724FC3683008D2935 /* APILogging.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3557E83024FAE0490037ED43 /* APILogging.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		35E0FC8A24FC3683008D2935 /* APISessionProtocol.swift in Headers */ = {isa = PBXBuildFile; fileRef = 35E0FC7F24FC3472008D2935 /* APISessionProtocol.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		35E0FC8B24FC3683008D2935 /* APIResponse.swift in Headers */ = {isa = PBXBuildFile; fileRef = 356161B524F8208100853505 /* APIResponse.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		35E0FC8C24FC3683008D2935 /* APISession.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3561618B24F8005F00853505 /* APISession.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		35E0FC8D24FC3683008D2935 /* APIRequest.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3561619E24F802CD00853505 /* APIRequest.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		35E0FC8E24FC3683008D2935 /* APICallback.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3557E83D24FB036F0037ED43 /* APICallback.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		35E0FC8F24FC3683008D2935 /* HTTPMethod.swift in Headers */ = {isa = PBXBuildFile; fileRef = 356161A024F8037E00853505 /* HTTPMethod.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		35E0FC9024FC3683008D2935 /* APIPayload.swift in Headers */ = {isa = PBXBuildFile; fileRef = 356161A424F804A300853505 /* APIPayload.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		35E0FC9124FC3683008D2935 /* APIModelParsing.swift in Headers */ = {isa = PBXBuildFile; fileRef = 356161AF24F80B8300853505 /* APIModelParsing.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		35E0FC9324FC3683008D2935 /* APIRequestAuthentication.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3557E83524FAE3750037ED43 /* APIRequestAuthentication.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		35E0FC9624FC3683008D2935 /* APINetworking.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3561618224F8001B00853505 /* APINetworking.swift */; settings = {ATTRIBUTES = (Public, ); }; };
 		35E0FCE624FC43C4008D2935 /* APIHTTPHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35E0FCE524FC43C4008D2935 /* APIHTTPHeader.swift */; };
 		35E0FCE824FC43E5008D2935 /* APIHTTPHeaders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35E0FCE724FC43E5008D2935 /* APIHTTPHeaders.swift */; };
 /* End PBXBuildFile section */
@@ -365,36 +351,11 @@
 		};
 /* End PBXGroup section */
 
-/* Begin PBXHeadersBuildPhase section */
-		35E0FC8124FC364A008D2935 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				35E0FC8224FC3683008D2935 /* APIRequest+Session.swift in Headers */,
-				35E0FC8324FC3683008D2935 /* Error+NSError.swift in Headers */,
-				35E0FC8424FC3683008D2935 /* APISessionPinning.swift in Headers */,
-				35E0FC8724FC3683008D2935 /* APILogging.swift in Headers */,
-				35E0FC8A24FC3683008D2935 /* APISessionProtocol.swift in Headers */,
-				35E0FC8B24FC3683008D2935 /* APIResponse.swift in Headers */,
-				35E0FC8C24FC3683008D2935 /* APISession.swift in Headers */,
-				35E0FC8D24FC3683008D2935 /* APIRequest.swift in Headers */,
-				35E0FC8E24FC3683008D2935 /* APICallback.swift in Headers */,
-				35E0FC8F24FC3683008D2935 /* HTTPMethod.swift in Headers */,
-				35E0FC9024FC3683008D2935 /* APIPayload.swift in Headers */,
-				35E0FC9124FC3683008D2935 /* APIModelParsing.swift in Headers */,
-				35E0FC9324FC3683008D2935 /* APIRequestAuthentication.swift in Headers */,
-				35E0FC9624FC3683008D2935 /* APINetworking.swift in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXHeadersBuildPhase section */
-
 /* Begin PBXNativeTarget section */
 		3561617E24F8001B00853505 /* Networking */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3561618624F8001B00853505 /* Build configuration list for PBXNativeTarget "Networking" */;
 			buildPhases = (
-				35E0FC8124FC364A008D2935 /* Headers */,
 				3561617B24F8001B00853505 /* Sources */,
 				3561617C24F8001B00853505 /* Frameworks */,
 				3561617D24F8001B00853505 /* CopyFiles */,
