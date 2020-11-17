@@ -455,8 +455,13 @@ extension APISession {
     
     private func logIncomingPayload(for request: APIRequest, data: Data?) {
         
-        // NOTE: If needed, add Payload obfuscation for log message when initializing APIRequest!
+        var desc: String?
+        if let logger = request.incomingLogger?.payload {
+            desc = logger.getPayloadDescription(for: data)
+        } else {
+            desc = PayloadUtility.getLogDescription(for: data)
+        }
         
-        APINetworking.log?.apiLog(message: "IN payload: \(PayloadUtility.getLogDescription(for: data) ?? "--")", type: .info)
+        APINetworking.log?.apiLog(message: "IN payload: \(desc ?? "--")", type: .info)
     }
 }
