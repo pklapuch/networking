@@ -12,13 +12,19 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
     
     public var onAuthenitcationRequired: OptionalErrorBlock?
     
+    public struct Key {
+        
+        public static let httpStatusCode = "infoStatusCode"
+        public static let errorModel = "errorModel"
+    }
+    
     public enum Error: CustomNSError, LocalizedError {
         
         case cancelled
         case invalidURL
         case duplicatedRequest
         case unauthorized
-        case backend(String)
+        case backend(info: [String: Any])
     
         public static var errorDomain: String { "APISession.Error" }
         public var errorCode: Int {
@@ -37,7 +43,15 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
             case .invalidURL: return "invalid URL"
             case .duplicatedRequest: return "duplicated request"
             case .unauthorized: return "unauthorized"
-            case .backend(let message): return "backend: \(message)"
+            case .backend(let info): return "backend: \(DictUtil.json(info: info) ?? "{}")"
+            }
+        }
+        
+        public var errorUserInfo: [String : Any] {
+            
+            switch self {
+            case .backend(let info): return info
+            default: return [:]
             }
         }
     }
@@ -216,14 +230,18 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
             return
         }
         
+        var info: [String: Any] = [Key.httpStatusCode: rawResponse.status ?? -1]
+        
         do {
             if let errorModel = try queuedRequest.request.parse(data: rawResponse.data ?? Data(), httpGroupCode: httpGroupCode) {
-                request(queuedRequest, didFailWithError: Error.backend(String(describing: errorModel)))
+                info[Key.errorModel] = errorModel
+                request(queuedRequest, didFailWithError: Error.backend(info: info))
             } else {
-                request(queuedRequest, didFailWithError: Error.backend("unknown"))
+                request(queuedRequest, didFailWithError: Error.backend(info: info))
             }
         } catch {
-            request(queuedRequest, didFailWithError: error)
+            info[Key.errorModel] = error
+            request(queuedRequest, didFailWithError: Error.backend(info: info))
         }
     }
     

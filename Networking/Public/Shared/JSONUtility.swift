@@ -13,6 +13,7 @@ struct JSONUtility {
     enum Error: CustomNSError {
         
         case dataDoesNotContainJsonArray
+        case modelNotEncodable
     }
     
     static func decode<T: Decodable>(data: Data, type: T.Type) throws -> T {
@@ -34,5 +35,16 @@ struct JSONUtility {
     static func encode<T: Encodable>(object: T) throws -> Data {
         
         return try JSONEncoder().encode(object)
+    }
+    
+    static func encodeJson<T: Encodable>(object: T) throws -> [String: Any] {
+        
+        let data = try encode(object: object)
+        
+        let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
+        
+        guard let jsonDict = json as? [String: Any] else { throw Error.modelNotEncodable }
+        
+        return jsonDict
     }
 }

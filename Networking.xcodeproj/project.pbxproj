@@ -51,6 +51,7 @@
 		35A354BD24FDAF8E004E0D65 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35A354BC24FDAF8E004E0D65 /* ViewController.swift */; };
 		35A354C224FDAF91004E0D65 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 35A354C124FDAF91004E0D65 /* Assets.xcassets */; };
 		35A354DA24FDAFC8004E0D65 /* libNetworking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3561617F24F8001B00853505 /* libNetworking.a */; };
+		35B7B36E256ADFA4003E14FB /* DictUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35B7B36D256ADFA4003E14FB /* DictUtil.swift */; };
 		35C1BFC6252E137900A61B64 /* APIQueuedRenewalOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C1BFC5252E137900A61B64 /* APIQueuedRenewalOperation.swift */; };
 		35C714A225262DA800450635 /* APIEndpointResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C714A125262DA800450635 /* APIEndpointResolver.swift */; };
 		35C714AD25263E2500450635 /* URL+String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C714AC25263E2500450635 /* URL+String.swift */; };
@@ -138,6 +139,7 @@
 		35A354BC24FDAF8E004E0D65 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		35A354C124FDAF91004E0D65 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		35A354C624FDAF91004E0D65 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		35B7B36D256ADFA4003E14FB /* DictUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictUtil.swift; sourceTree = "<group>"; };
 		35C1BFC5252E137900A61B64 /* APIQueuedRenewalOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIQueuedRenewalOperation.swift; sourceTree = "<group>"; };
 		35C714A125262DA800450635 /* APIEndpointResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIEndpointResolver.swift; sourceTree = "<group>"; };
 		35C714AC25263E2500450635 /* URL+String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+String.swift"; sourceTree = "<group>"; };
@@ -192,6 +194,7 @@
 				35887D66252556AE0015E04F /* Data+String.swift */,
 				35C714AC25263E2500450635 /* URL+String.swift */,
 				3568F76F253E3605009470AE /* URL+Query.swift */,
+				35B7B36D256ADFA4003E14FB /* DictUtil.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -478,6 +481,7 @@
 				35C714AD25263E2500450635 /* URL+String.swift in Sources */,
 				3557E83E24FB03700037ED43 /* APICallback.swift in Sources */,
 				3561618C24F8005F00853505 /* APISession.swift in Sources */,
+				35B7B36E256ADFA4003E14FB /* DictUtil.swift in Sources */,
 				357C8D8024FB18D0001D012C /* APIQueuedRequest.swift in Sources */,
 				3561619F24F802CD00853505 /* APIRequest.swift in Sources */,
 				356161B624F8208100853505 /* APIResponse.swift in Sources */,

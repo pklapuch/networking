@@ -21,14 +21,14 @@ struct PayloadUtility {
         guard let data = data else { return nil }
         var formattedJSON: String?
         
-        if let json = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) {
+        if let json = try? JSONSerialization.jsonObject(with: data, options: .allowFragments), !(json is NSNull) {
             if let prettyData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
                 if let jsonString = String(data: prettyData, encoding: .utf8) {
                     return jsonString
                 }
             }
         }
-        
+            
         if (formattedJSON == nil) {
             if let tmp = String(data: data, encoding: .utf8), !tmp.isEmpty {
                 formattedJSON = tmp
