@@ -66,6 +66,7 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
     // Session specific headers
     private var headers: APIHTTPHeaders? = nil
     
+    private var cancelled = false
     private var signatureRenewalPending = false
     
     /** Requests not currently executing and waiting to be executed */
@@ -91,6 +92,7 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
         queue.async { [weak self] in
 
             guard let self = self else { return }
+            guard !self.cancelled else { onError(Error.cancelled); return }
             guard self.isUnique(request: request) else { onError(Error.duplicatedRequest); return }
 
             let callback = APIRequest.APICallback(onSuccess: onSuccess, onError: onError)
@@ -135,6 +137,12 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
         queuedRequests.removeAll()
         
         requests.forEach { resume(queuedRequest: $0) }
+    }
+    
+    private func cancelAllQueuedRequests() {
+        
+        queuedRequests.forEach { $0.callback.onError(Error.cancelled) }
+        queuedRequests.removeAll()
     }
     
     private func resume(queuedRequest: APIQueuedRequest) {
@@ -227,6 +235,15 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
             } catch {
                 request(queuedRequest, didFailWithError: error)
             }
+            return
+        }
+        
+        // NOTE: Invalid or missing auth token
+        if rawResponse.status == 403 && signing != nil {
+            cancelled = true
+            cancelAllQueuedRequests()
+            onAuthenitcationRequired?(Error.unauthorized)
+            request(queuedRequest, didFailWithError: Error.cancelled)
             return
         }
         

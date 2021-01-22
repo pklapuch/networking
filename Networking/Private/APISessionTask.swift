@@ -13,9 +13,6 @@ class APISessionTask: NSObject {
     var onSuccess: URLResponseBlock?
     var onError: ErrorBlock?
     
-    // TODO:
-    // Add delegate for payload obfuscation etc...
-    
     var task: URLSessionTask? = nil
     var urlRequest: URLRequest
     var cancelled: Bool
