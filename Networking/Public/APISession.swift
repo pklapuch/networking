@@ -239,7 +239,7 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
         }
         
         // NOTE: Invalid or missing auth token
-        if rawResponse.status == 403 && signing != nil {
+        if rawResponse.status == 401 && signing != nil {
             cancelled = true
             cancelAllQueuedRequests()
             onAuthenitcationRequired?(Error.unauthorized)
