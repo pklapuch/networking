@@ -60,6 +60,7 @@
 		35E0FC8024FC3472008D2935 /* APISessionProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35E0FC7F24FC3472008D2935 /* APISessionProtocol.swift */; };
 		35E0FCE624FC43C4008D2935 /* APIHTTPHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35E0FCE524FC43C4008D2935 /* APIHTTPHeader.swift */; };
 		35E0FCE824FC43E5008D2935 /* APIHTTPHeaders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35E0FCE724FC43E5008D2935 /* APIHTTPHeaders.swift */; };
+		35EDBBCC25BF2AAC007CD9A4 /* APISessionGlobalErrorConsumer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35EDBBCB25BF2AAC007CD9A4 /* APISessionGlobalErrorConsumer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -148,6 +149,7 @@
 		35E0FC7F24FC3472008D2935 /* APISessionProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APISessionProtocol.swift; sourceTree = "<group>"; };
 		35E0FCE524FC43C4008D2935 /* APIHTTPHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIHTTPHeader.swift; sourceTree = "<group>"; };
 		35E0FCE724FC43E5008D2935 /* APIHTTPHeaders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIHTTPHeaders.swift; sourceTree = "<group>"; };
+		35EDBBCB25BF2AAC007CD9A4 /* APISessionGlobalErrorConsumer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APISessionGlobalErrorConsumer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -216,6 +218,7 @@
 				35E0FC7F24FC3472008D2935 /* APISessionProtocol.swift */,
 				35C714A125262DA800450635 /* APIEndpointResolver.swift */,
 				351396CA252D58EA00A0033D /* APISigning.swift */,
+				35EDBBCB25BF2AAC007CD9A4 /* APISessionGlobalErrorConsumer.swift */,
 			);
 			path = Protocol;
 			sourceTree = "<group>";
@@ -492,6 +495,7 @@
 				351396CB252D58EA00A0033D /* APISigning.swift in Sources */,
 				356161C624F9B2FA00853505 /* Data+Hex.swift in Sources */,
 				35E0FCE624FC43C4008D2935 /* APIHTTPHeader.swift in Sources */,
+				35EDBBCC25BF2AAC007CD9A4 /* APISessionGlobalErrorConsumer.swift in Sources */,
 				35C714AF25263E5300450635 /* URLError.swift in Sources */,
 				35E0FCE824FC43E5008D2935 /* APIHTTPHeaders.swift in Sources */,
 				3561618324F8001B00853505 /* APINetworking.swift in Sources */,

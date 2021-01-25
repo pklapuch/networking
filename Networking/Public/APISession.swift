@@ -62,6 +62,7 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
     private let signing: APISigning?
     private let pinning: APISessionPinner?
     private let resolver: APIEndpointResolver?
+    private let errorConsumer: APISessionGlobalErrorConsumer?
     
     // Session specific headers
     private var headers: APIHTTPHeaders? = nil
@@ -78,11 +79,13 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
     public init(configuration: URLSessionConfiguration,
                 signing: APISigning? = nil,
                 pinning: APISessionPinning? = nil,
-                resolver: APIEndpointResolver? = nil) {
+                resolver: APIEndpointResolver? = nil,
+                errorConsumer: APISessionGlobalErrorConsumer? = nil) {
         
         self.signing = signing
         self.pinning = APISessionPinner.create(pinning: pinning)
         self.resolver = resolver
+        self.errorConsumer = errorConsumer
         super.init()
         self.urlSession = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
     }
@@ -238,13 +241,17 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
             return
         }
         
-        // NOTE: Invalid or missing auth token
-        if rawResponse.status == 401 && signing != nil {
-            cancelled = true
-            cancelAllQueuedRequests()
-            onAuthenitcationRequired?(Error.unauthorized)
-            request(queuedRequest, didFailWithError: Error.cancelled)
-            return
+        if let errorConsumer = errorConsumer {
+            let policy = errorConsumer.getPolicy(session: self, rawResponse: rawResponse)
+            switch policy {
+            
+            case .default: ()
+            case .cancelCurrentRequest: ()
+            case .cancellAllAndDisable:
+                cancelled = true
+                cancelAllQueuedRequests()
+                request(queuedRequest, didFailWithError: Error.cancelled)
+            }
         }
         
         var info: [String: Any] = [Key.httpStatusCode: rawResponse.status ?? -1]
