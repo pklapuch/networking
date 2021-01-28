@@ -198,19 +198,27 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
             self.logOutgoing(request: queuedRequest.request, sessionTask: task)
 
             task.resume(onSuccess: { [weak self] data, urlResponse in
-                self?.request(queuedRequest, didGetURLResponse: urlResponse, andData: data)
+                self?.task(with: queuedRequest, didGetURLResponse: urlResponse, andData: data)
             }) { [weak self] error in
-                self?.request(queuedRequest, didFailWithError: error)
+                self?.task(with: queuedRequest, didFailWithError: error)
             }
         }
     }
 
-    private func request(_ queuedRequest: APIQueuedRequest, didGetURLResponse urlResponse: URLResponse?, andData data: Data?) {
+    private func task(with queuedRequest: APIQueuedRequest, didGetURLResponse urlResponse: URLResponse?, andData data: Data?) {
         
         queue.async { [weak self] in
             guard let self = self else { return }
             self.logIncoming(request: queuedRequest.request, data: data, urlResponse: urlResponse)
             self.request(queuedRequest, didGetRawResopsne: self.getRawResponse(fromData: data, urlResponse: urlResponse))
+        }
+    }
+    
+    private func task(with queuedRequest: APIQueuedRequest, didFailWithError error: Swift.Error) {
+        queue.async { [weak self] in
+            guard let self = self else { return }
+            self.logIncoming(request: queuedRequest.request, error: error)
+            self.request(queuedRequest, didFailWithError: error)
         }
     }
     
@@ -478,6 +486,12 @@ extension APISession {
         logIncomingPayload(for: request, data: data)
     }
     
+    private func logIncoming(request: APIRequest, error: Swift.Error) {
+        
+        logIncomingURL(for: request, error: error)
+        logIncomingPipelineError(error: error)
+    }
+    
     private func logIncomingURL(for request: APIRequest, urlResponse: URLResponse?) {
         
         // NOTE: If needed, add URL obfuscation for log message when initializing APIRequest!
@@ -486,6 +500,13 @@ extension APISession {
         let code = httpUrlResponse?.statusCode
         
         APINetworking.log?.apiLog(message: "IN: \(urlResponse?.url?.absoluteString ?? request.path) (\(request.method.rawValue)) - \(code ?? -1)", type: .info)
+    }
+    
+    private func logIncomingURL(for request: APIRequest, error: Swift.Error) {
+        
+        let code = error.code
+        let path = try? getURL(for: request).absoluteString
+        APINetworking.log?.apiLog(message: "IN: \(path ?? request.path) (\(request.method.rawValue)) - \(code)", type: .info)
     }
     
     private func logIncomingHeaders(for request: APIRequest, urlResponse: URLResponse?) {
@@ -505,5 +526,10 @@ extension APISession {
         }
         
         APINetworking.log?.apiLog(message: "IN payload: \(desc ?? "--")", type: .info)
+    }
+    
+    private func logIncomingPipelineError(error: Swift.Error) {
+        
+        APINetworking.log?.apiLog(message: "IN error: \(error.localizedDescription)", type: .info)
     }
 }
