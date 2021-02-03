@@ -499,14 +499,14 @@ extension APISession {
         let httpUrlResponse = urlResponse as? HTTPURLResponse
         let code = httpUrlResponse?.statusCode
         
-        APINetworking.log?.apiLog(message: "IN: \(urlResponse?.url?.absoluteString ?? request.path) (\(request.method.rawValue)) - \(code ?? -1)", type: .info)
+        APINetworking.log?.apiLog(message: "IN: \(urlResponse?.url?.absoluteString ?? request.path) (\(request.method.rawValue)): (\(code ?? -1))", type: .info)
     }
     
     private func logIncomingURL(for request: APIRequest, error: Swift.Error) {
         
         let code = error.code
         let path = try? getURL(for: request).absoluteString
-        APINetworking.log?.apiLog(message: "IN: \(path ?? request.path) (\(request.method.rawValue)) - \(code)", type: .info)
+        APINetworking.log?.apiLog(message: "IN: \(path ?? request.path) (\(request.method.rawValue)): (\(code))", type: .info)
     }
     
     private func logIncomingHeaders(for request: APIRequest, urlResponse: URLResponse?) {
