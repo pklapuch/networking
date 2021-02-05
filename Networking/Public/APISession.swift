@@ -453,21 +453,29 @@ extension APISession {
     
     private func logOutgoingURL(for request: APIRequest, urlRequest: URLRequest) {
         
-        // NOTE: If needed, add URL obfuscation for log message when initializing APIRequest!
+        var desc: String?
+        if let logger = request.outgoingLogger?.url, let url = urlRequest.url {
+            desc = logger.getURLDescription(for: url)
+        } else {
+            desc = "\(urlRequest.url?.absoluteString ?? request.path)"
+        }
         
-        APINetworking.log?.apiLog(message: "OUT: \(urlRequest.url?.absoluteString ?? request.path) (\(request.method.rawValue))", type: .info)
+        APINetworking.log?.apiLog(message: "OUT: \(desc ?? "--") (\(request.method.rawValue))", type: .info)
     }
     
     private func logOutgoingHeaders(for request: APIRequest, urlRequest: URLRequest) {
         
-        // NOTE: If needed, add Headers obfuscation for log message when initializing APIRequest!
+        var desc: String?
+        if let logger = request.outgoingLogger?.headers, let headers = urlRequest.allHTTPHeaderFields {
+            desc = logger.getHeadersDescription(for: headers)
+        } else {
+            desc = urlRequest.getHeadersDescription()
+        }
         
-        APINetworking.log?.apiLog(message: "OUT headers: \( urlRequest.getHeadersDescription())", type: .info)
+        APINetworking.log?.apiLog(message: "OUT headers: \(desc ?? "--")", type: .info)
     }
     
     private func logOutgoingPayload(for request: APIRequest, urlRequest: URLRequest) {
-        
-        // NOTE: If needed, add Payload obfuscation for log message when initializing APIRequest!
         
         var desc: String?
         if let logger = request.outgoingLogger?.payload {
@@ -494,26 +502,42 @@ extension APISession {
     
     private func logIncomingURL(for request: APIRequest, urlResponse: URLResponse?) {
         
-        // NOTE: If needed, add URL obfuscation for log message when initializing APIRequest!
+        var desc: String?
+        if let logger = request.incomingLogger?.url, let url = urlResponse?.url {
+            desc = logger.getURLDescription(for: url)
+        } else {
+            desc = "\(urlResponse?.url?.absoluteString ?? request.path)"
+        }
         
         let httpUrlResponse = urlResponse as? HTTPURLResponse
         let code = httpUrlResponse?.statusCode
         
-        APINetworking.log?.apiLog(message: "IN: \(urlResponse?.url?.absoluteString ?? request.path) (\(request.method.rawValue)): (\(code ?? -1))", type: .info)
+        APINetworking.log?.apiLog(message: "IN: \(desc ?? "--") (\(request.method.rawValue)): (\(code ?? -1))", type: .info)
     }
     
     private func logIncomingURL(for request: APIRequest, error: Swift.Error) {
         
+        var desc: String?
+        if let logger = request.incomingLogger?.url, let url = try? getURL(for: request) {
+            desc = logger.getURLDescription(for: url)
+        } else {
+            desc = "\(request.path)"
+        }
+        
         let code = error.code
-        let path = try? getURL(for: request).absoluteString
-        APINetworking.log?.apiLog(message: "IN: \(path ?? request.path) (\(request.method.rawValue)): (\(code))", type: .info)
+        APINetworking.log?.apiLog(message: "IN: \(desc ?? "--") (\(request.method.rawValue)): (\(code))", type: .info)
     }
     
     private func logIncomingHeaders(for request: APIRequest, urlResponse: URLResponse?) {
         
-        // NOTE: If needed, add Headers obfuscation for log message when initializing APIRequest!
+        var desc: String?
+        if let logger = request.incomingLogger?.headers, let headers = (urlResponse as? HTTPURLResponse)?.allHeaderFields as? [String: String] {
+            desc = logger.getHeadersDescription(for: headers)
+        } else {
+            desc = urlResponse?.getHeadersDescription()
+        }
         
-        APINetworking.log?.apiLog(message: "IN headers: \( urlResponse?.getHeadersDescription() ?? "--")", type: .info)
+        APINetworking.log?.apiLog(message: "IN headers: \(desc ?? "--")", type: .info)
     }
     
     private func logIncomingPayload(for request: APIRequest, data: Data?) {

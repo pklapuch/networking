@@ -15,7 +15,7 @@ public protocol APIURLLogging {
 
 public protocol APIHeaderLogging {
     
-    func getHeadersDescription(for headers: APIHTTPHeaders) -> String?
+    func getHeadersDescription(for headers: [String : String]) -> String?
 }
 
 public protocol APIPayloadLogging {
