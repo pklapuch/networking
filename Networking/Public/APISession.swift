@@ -62,10 +62,12 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
     private let signing: APISigning?
     private let pinning: APISessionPinner?
     private let resolver: APIEndpointResolver?
+    private let errorConsumer: APISessionGlobalErrorConsumer?
     
     // Session specific headers
     private var headers: APIHTTPHeaders? = nil
     
+    private var cancelled = false
     private var signatureRenewalPending = false
     
     /** Requests not currently executing and waiting to be executed */
@@ -77,11 +79,13 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
     public init(configuration: URLSessionConfiguration,
                 signing: APISigning? = nil,
                 pinning: APISessionPinning? = nil,
-                resolver: APIEndpointResolver? = nil) {
+                resolver: APIEndpointResolver? = nil,
+                errorConsumer: APISessionGlobalErrorConsumer? = nil) {
         
         self.signing = signing
         self.pinning = APISessionPinner.create(pinning: pinning)
         self.resolver = resolver
+        self.errorConsumer = errorConsumer
         super.init()
         self.urlSession = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
     }
@@ -91,6 +95,7 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
         queue.async { [weak self] in
 
             guard let self = self else { return }
+            guard !self.cancelled else { onError(Error.cancelled); return }
             guard self.isUnique(request: request) else { onError(Error.duplicatedRequest); return }
 
             let callback = APIRequest.APICallback(onSuccess: onSuccess, onError: onError)
@@ -135,6 +140,12 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
         queuedRequests.removeAll()
         
         requests.forEach { resume(queuedRequest: $0) }
+    }
+    
+    private func cancelAllQueuedRequests() {
+        
+        queuedRequests.forEach { $0.callback.onError(Error.cancelled) }
+        queuedRequests.removeAll()
     }
     
     private func resume(queuedRequest: APIQueuedRequest) {
@@ -187,19 +198,27 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
             self.logOutgoing(request: queuedRequest.request, sessionTask: task)
 
             task.resume(onSuccess: { [weak self] data, urlResponse in
-                self?.request(queuedRequest, didGetURLResponse: urlResponse, andData: data)
+                self?.task(with: queuedRequest, didGetURLResponse: urlResponse, andData: data)
             }) { [weak self] error in
-                self?.request(queuedRequest, didFailWithError: error)
+                self?.task(with: queuedRequest, didFailWithError: error)
             }
         }
     }
 
-    private func request(_ queuedRequest: APIQueuedRequest, didGetURLResponse urlResponse: URLResponse?, andData data: Data?) {
+    private func task(with queuedRequest: APIQueuedRequest, didGetURLResponse urlResponse: URLResponse?, andData data: Data?) {
         
         queue.async { [weak self] in
             guard let self = self else { return }
             self.logIncoming(request: queuedRequest.request, data: data, urlResponse: urlResponse)
             self.request(queuedRequest, didGetRawResopsne: self.getRawResponse(fromData: data, urlResponse: urlResponse))
+        }
+    }
+    
+    private func task(with queuedRequest: APIQueuedRequest, didFailWithError error: Swift.Error) {
+        queue.async { [weak self] in
+            guard let self = self else { return }
+            self.logIncoming(request: queuedRequest.request, error: error)
+            self.request(queuedRequest, didFailWithError: error)
         }
     }
     
@@ -228,6 +247,19 @@ public class APISession: NSObject, URLSessionDelegate, APISessionProtocol {
                 request(queuedRequest, didFailWithError: error)
             }
             return
+        }
+        
+        if let errorConsumer = errorConsumer {
+            let policy = errorConsumer.getPolicy(session: self, rawResponse: rawResponse)
+            switch policy {
+            
+            case .default: ()
+            case .cancelCurrentRequest: ()
+            case .cancellAllAndDisable:
+                cancelled = true
+                cancelAllQueuedRequests()
+                request(queuedRequest, didFailWithError: Error.cancelled)
+            }
         }
         
         var info: [String: Any] = [Key.httpStatusCode: rawResponse.status ?? -1]
@@ -421,21 +453,29 @@ extension APISession {
     
     private func logOutgoingURL(for request: APIRequest, urlRequest: URLRequest) {
         
-        // NOTE: If needed, add URL obfuscation for log message when initializing APIRequest!
+        var desc: String?
+        if let logger = request.outgoingLogger?.url, let url = urlRequest.url {
+            desc = logger.getURLDescription(for: url)
+        } else {
+            desc = "\(urlRequest.url?.absoluteString ?? request.path)"
+        }
         
-        APINetworking.log?.apiLog(message: "OUT: \(urlRequest.url?.absoluteString ?? request.path) (\(request.method.rawValue))", type: .info)
+        APINetworking.log?.apiLog(message: "OUT: \(desc ?? "--") (\(request.method.rawValue))", type: .info)
     }
     
     private func logOutgoingHeaders(for request: APIRequest, urlRequest: URLRequest) {
         
-        // NOTE: If needed, add Headers obfuscation for log message when initializing APIRequest!
+        var desc: String?
+        if let logger = request.outgoingLogger?.headers, let headers = urlRequest.allHTTPHeaderFields {
+            desc = logger.getHeadersDescription(for: headers)
+        } else {
+            desc = urlRequest.getHeadersDescription()
+        }
         
-        APINetworking.log?.apiLog(message: "OUT headers: \( urlRequest.getHeadersDescription())", type: .info)
+        APINetworking.log?.apiLog(message: "OUT headers: \(desc ?? "--")", type: .info)
     }
     
     private func logOutgoingPayload(for request: APIRequest, urlRequest: URLRequest) {
-        
-        // NOTE: If needed, add Payload obfuscation for log message when initializing APIRequest!
         
         var desc: String?
         if let logger = request.outgoingLogger?.payload {
@@ -454,21 +494,50 @@ extension APISession {
         logIncomingPayload(for: request, data: data)
     }
     
+    private func logIncoming(request: APIRequest, error: Swift.Error) {
+        
+        logIncomingURL(for: request, error: error)
+        logIncomingPipelineError(error: error)
+    }
+    
     private func logIncomingURL(for request: APIRequest, urlResponse: URLResponse?) {
         
-        // NOTE: If needed, add URL obfuscation for log message when initializing APIRequest!
+        var desc: String?
+        if let logger = request.incomingLogger?.url, let url = urlResponse?.url {
+            desc = logger.getURLDescription(for: url)
+        } else {
+            desc = "\(urlResponse?.url?.absoluteString ?? request.path)"
+        }
         
         let httpUrlResponse = urlResponse as? HTTPURLResponse
         let code = httpUrlResponse?.statusCode
         
-        APINetworking.log?.apiLog(message: "IN: \(urlResponse?.url?.absoluteString ?? request.path) (\(request.method.rawValue)) - \(code ?? -1)", type: .info)
+        APINetworking.log?.apiLog(message: "IN: \(desc ?? "--") (\(request.method.rawValue)): (\(code ?? -1))", type: .info)
+    }
+    
+    private func logIncomingURL(for request: APIRequest, error: Swift.Error) {
+        
+        var desc: String?
+        if let logger = request.incomingLogger?.url, let url = try? getURL(for: request) {
+            desc = logger.getURLDescription(for: url)
+        } else {
+            desc = "\(request.path)"
+        }
+        
+        let code = error.code
+        APINetworking.log?.apiLog(message: "IN: \(desc ?? "--") (\(request.method.rawValue)): (\(code))", type: .info)
     }
     
     private func logIncomingHeaders(for request: APIRequest, urlResponse: URLResponse?) {
         
-        // NOTE: If needed, add Headers obfuscation for log message when initializing APIRequest!
+        var desc: String?
+        if let logger = request.incomingLogger?.headers, let headers = (urlResponse as? HTTPURLResponse)?.allHeaderFields as? [String: String] {
+            desc = logger.getHeadersDescription(for: headers)
+        } else {
+            desc = urlResponse?.getHeadersDescription()
+        }
         
-        APINetworking.log?.apiLog(message: "IN headers: \( urlResponse?.getHeadersDescription() ?? "--")", type: .info)
+        APINetworking.log?.apiLog(message: "IN headers: \(desc ?? "--")", type: .info)
     }
     
     private func logIncomingPayload(for request: APIRequest, data: Data?) {
@@ -481,5 +550,10 @@ extension APISession {
         }
         
         APINetworking.log?.apiLog(message: "IN payload: \(desc ?? "--")", type: .info)
+    }
+    
+    private func logIncomingPipelineError(error: Swift.Error) {
+        
+        APINetworking.log?.apiLog(message: "IN error: \(error.localizedDescription)", type: .info)
     }
 }
