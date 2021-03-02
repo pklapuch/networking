@@ -12,6 +12,7 @@ public struct APIMultipartContainer {
     public enum ContentType: String {
         
         case plainText = "text/plain"
+        case jpeg = "image/jpeg"
         case zip = "application/zip"
     }
     
@@ -41,6 +42,7 @@ public struct APIMultipartContainer {
         content.append(try Data.from(text: "--\(boundary)\r\n", encoding: .utf8))
         content.append(try Data.from(text: "\(disposition.content)\r\n\r\n", encoding: .utf8))
         content.append(try Data.from(text: "\(value)", encoding: .utf8))
+        content.append(try Data.from(text: "\r\n", encoding: .utf8))
     }
     
     public mutating func add(data: Data,

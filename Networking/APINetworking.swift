@@ -6,7 +6,6 @@
 //  Copyright © 2020 Pawel Klapuch. All rights reserved.
 //
 
-
 public class APINetworking {
 
     static public var log: APILogging?
