@@ -11,6 +11,7 @@
 		3536141F24FBF71300399906 /* APIRequest+Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3536141E24FBF71300399906 /* APIRequest+Session.swift */; };
 		3536142124FBFB2300399906 /* Error+NSError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3536142024FBFB2300399906 /* Error+NSError.swift */; };
 		3536142424FC1DC800399906 /* APISession+InternalError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3536142324FC1DC800399906 /* APISession+InternalError.swift */; };
+		35565C2B25F2B4F000DF4105 /* JSONPayloadObfuscator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35565C2A25F2B4F000DF4105 /* JSONPayloadObfuscator.swift */; };
 		3557E82324FAB61A0037ED43 /* APISessionPinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3557E82224FAB61A0037ED43 /* APISessionPinner.swift */; };
 		3557E82624FABC400037ED43 /* HTTPQuerySerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3557E82524FABC400037ED43 /* HTTPQuerySerializer.swift */; };
 		3557E83124FAE0490037ED43 /* APILogging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3557E83024FAE0490037ED43 /* APILogging.swift */; };
@@ -98,6 +99,7 @@
 		3536141E24FBF71300399906 /* APIRequest+Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "APIRequest+Session.swift"; sourceTree = "<group>"; };
 		3536142024FBFB2300399906 /* Error+NSError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Error+NSError.swift"; sourceTree = "<group>"; };
 		3536142324FC1DC800399906 /* APISession+InternalError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "APISession+InternalError.swift"; sourceTree = "<group>"; };
+		35565C2A25F2B4F000DF4105 /* JSONPayloadObfuscator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONPayloadObfuscator.swift; sourceTree = "<group>"; };
 		3557E82224FAB61A0037ED43 /* APISessionPinner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APISessionPinner.swift; sourceTree = "<group>"; };
 		3557E82524FABC400037ED43 /* HTTPQuerySerializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPQuerySerializer.swift; sourceTree = "<group>"; };
 		3557E83024FAE0490037ED43 /* APILogging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APILogging.swift; sourceTree = "<group>"; };
@@ -350,6 +352,7 @@
 			isa = PBXGroup;
 			children = (
 				3594779125DB1BDC0060441A /* HTTPHeaderObfuscator.swift */,
+				35565C2A25F2B4F000DF4105 /* JSONPayloadObfuscator.swift */,
 			);
 			path = Obfuscator;
 			sourceTree = "<group>";
@@ -503,6 +506,7 @@
 				356161B024F80B8300853505 /* APIModelParsing.swift in Sources */,
 				3536142124FBFB2300399906 /* Error+NSError.swift in Sources */,
 				3560B686252775DD005BD577 /* APIPayloadLogging.swift in Sources */,
+				35565C2B25F2B4F000DF4105 /* JSONPayloadObfuscator.swift in Sources */,
 				351396CB252D58EA00A0033D /* APISigning.swift in Sources */,
 				356161C624F9B2FA00853505 /* Data+Hex.swift in Sources */,
 				35E0FCE624FC43C4008D2935 /* APIHTTPHeader.swift in Sources */,

@@ -512,7 +512,7 @@ extension APISession {
         let httpUrlResponse = urlResponse as? HTTPURLResponse
         let code = httpUrlResponse?.statusCode
         
-        APINetworking.log?.apiLog(message: "IN: \(desc ?? "--") (\(request.method.rawValue)): (\(code ?? -1))", type: .info)
+        APINetworking.log?.apiLog(message: "IN \(desc ?? "--") (\(request.method.rawValue)): (\(code ?? -1))", type: .info)
     }
     
     private func logIncomingURL(for request: APIRequest, error: Swift.Error) {
@@ -525,7 +525,7 @@ extension APISession {
         }
         
         let code = error.code
-        APINetworking.log?.apiLog(message: "IN: \(desc ?? "--") (\(request.method.rawValue)): (\(code))", type: .info)
+        APINetworking.log?.apiLog(message: "IN \(desc ?? "--") (\(request.method.rawValue)): (\(code))", type: .info)
     }
     
     private func logIncomingHeaders(for request: APIRequest, urlResponse: URLResponse?) {
